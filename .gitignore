@@ -1,0 +1,61 @@
+# =============================================================================
+# SENSITIVE & ENVIRONMENT-SPECIFIC FILES
+# =============================================================================
+# Never commit secrets or environment-specific configurations.
+.env
+.env.local
+.env.*.local
+
+# =============================================================================
+# BACKEND - Java, Gradle, Spring Boot (GoalsManager)
+# =============================================================================
+# Compiled Java class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# Packaged Java archives (these are build artifacts)
+*.jar
+*.war
+*.ear
+
+# Gradle build output and cache
+.gradle/
+build/
+
+# IDE-specific output directory
+out/
+
+# =============================================================================
+# FRONTEND - Node.js, Next.js, TypeScript (photon)
+# =============================================================================
+# Dependency directories
+node_modules/
+
+# Next.js build output and cache
+.next/
+
+# Production build folder (if you use `next export`)
+out/
+
+# =/
+# IDE & EDITOR CONFIGURATION
+# =============================================================================
+# JetBrains IDEs (IntelliJ IDEA)
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+
+# =============================================================================
+# OPERATING SYSTEM & MISCELLANEOUS
+# =============================================================================
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+

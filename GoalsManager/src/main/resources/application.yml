@@ -1,0 +1,24 @@
+spring:
+  # This setting tells JPA to automatically create or update your database schema 
+  # based on your Java entity classes. It's very useful for development.
+  jpa:
+    hibernate:
+      ddl-auto: update
+  
+  # This section configures the scopes for your OAuth2 clients.
+  # The actual client ID and secret will be read from the environment variables
+  # you set in your docker-compose.yml and .env files.
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            scope:
+              - openid
+              - email
+              - profile
+          github:
+            scope:
+              - read:user
+              - user:email
+
