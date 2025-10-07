@@ -4,21 +4,4 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-  
-  # This section configures the scopes for your OAuth2 clients.
-  # The actual client ID and secret will be read from the environment variables
-  # you set in your docker-compose.yml and .env files.
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            scope:
-              - openid
-              - email
-              - profile
-          github:
-            scope:
-              - read:user
-              - user:email
 
