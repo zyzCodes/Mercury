@@ -36,12 +36,6 @@ public class User {
     @NotBlank(message = "Provider ID is required")
     private String providerId;
 
-    /**
-     * Legacy field for GitHub ID (optional, kept for backward compatibility)
-     */
-    @Column(name = "github_id")
-    private String githubId;
-
     @Column(unique = true, nullable = false)
     @NotBlank(message = "Username is required")
     private String username;
@@ -100,14 +94,6 @@ public class User {
 
     public void setProviderId(String providerId) {
         this.providerId = providerId;
-    }
-
-    public String getGithubId() {
-        return githubId;
-    }
-
-    public void setGithubId(String githubId) {
-        this.githubId = githubId;
     }
 
     public String getUsername() {

@@ -15,9 +15,6 @@ public class CreateUserRequest {
     @NotBlank(message = "Provider ID is required")
     private String providerId;
     
-    // Legacy field for backward compatibility
-    private String githubId;
-    
     @NotBlank(message = "Username is required")
     private String username;
     
@@ -55,14 +52,6 @@ public class CreateUserRequest {
 
     public void setProviderId(String providerId) {
         this.providerId = providerId;
-    }
-
-    public String getGithubId() {
-        return githubId;
-    }
-
-    public void setGithubId(String githubId) {
-        this.githubId = githubId;
     }
 
     public String getUsername() {

@@ -20,13 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByProviderAndProviderId(String provider, String providerId);
     
     /**
-     * Find a user by their GitHub ID (legacy support)
-     * @param githubId The GitHub ID of the user
-     * @return Optional containing the user if found
-     */
-    Optional<User> findByGithubId(String githubId);
-    
-    /**
      * Find a user by their username
      * @param username The username of the user
      * @return Optional containing the user if found
@@ -54,25 +47,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return true if user exists, false otherwise
      */
     boolean existsByProviderAndProviderId(String provider, String providerId);
-    
-    /**
-     * Check if a user exists with the given GitHub ID (legacy support)
-     * @param githubId The GitHub ID to check
-     * @return true if user exists, false otherwise
-     */
-    boolean existsByGithubId(String githubId);
-    
-    /**
-     * Check if a user exists with the given username
-     * @param username The username to check
-     * @return true if user exists, false otherwise
-     */
-    boolean existsByUsername(String username);
-    
-    /**
-     * Check if a user exists with the given email
-     * @param email The email to check
-     * @return true if user exists, false otherwise
-     */
-    boolean existsByEmail(String email);
 }

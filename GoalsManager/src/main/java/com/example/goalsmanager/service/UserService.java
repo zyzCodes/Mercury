@@ -68,14 +68,6 @@ public class UserService {
     }
 
     /**
-     * Get a user by their GitHub ID
-     */
-    public Optional<UserDTO> getUserByGithubId(String githubId) {
-        return userRepository.findByGithubId(githubId)
-                .map(UserDTO::new);
-    }
-
-    /**
      * Get a user by their username
      */
     public Optional<UserDTO> getUserByUsername(String username) {
@@ -129,13 +121,6 @@ public class UserService {
     }
 
     /**
-     * Check if a user exists by GitHub ID (legacy support)
-     */
-    public boolean existsByGithubId(String githubId) {
-        return userRepository.existsByGithubId(githubId);
-    }
-
-    /**
      * Helper method to update user fields from request
      */
     private void updateUserFromRequest(User user, CreateUserRequest request) {
@@ -145,9 +130,5 @@ public class UserService {
         user.setAvatarUrl(request.getAvatarUrl());
         user.setBio(request.getBio());
         user.setLocation(request.getLocation());
-        // Set githubId if provided (for backward compatibility)
-        if (request.getGithubId() != null) {
-            user.setGithubId(request.getGithubId());
-        }
     }
 }

@@ -13,7 +13,6 @@ public class UserDTO {
     private Long id;
     private String provider;
     private String providerId;
-    private String githubId;  // Legacy field
     private String username;
     private String email;
     private String name;
@@ -23,15 +22,10 @@ public class UserDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Constructors
-    public UserDTO() {
-    }
-
     public UserDTO(User user) {
         this.id = user.getId();
         this.provider = user.getProvider();
         this.providerId = user.getProviderId();
-        this.githubId = user.getGithubId();
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.name = user.getName();
@@ -65,14 +59,6 @@ public class UserDTO {
 
     public void setProviderId(String providerId) {
         this.providerId = providerId;
-    }
-
-    public String getGithubId() {
-        return githubId;
-    }
-
-    public void setGithubId(String githubId) {
-        this.githubId = githubId;
     }
 
     public String getUsername() {

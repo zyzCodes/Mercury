@@ -26,7 +26,6 @@ const handler = NextAuth({
             await createOrUpdateUser({
               provider: 'github',
               providerId: githubProfile.id.toString(),
-              githubId: githubProfile.id.toString(), // For backward compatibility
               username: githubProfile.login || user.name || 'unknown',
               email: user.email || '',
               name: user.name || null,

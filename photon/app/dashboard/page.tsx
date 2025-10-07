@@ -96,12 +96,6 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-600 font-medium">Provider ID</p>
                     <p className="text-lg text-gray-900">{user.providerId}</p>
                   </div>
-                  {user.githubId && (
-                    <div className="bg-gray-50 p-4 rounded">
-                      <p className="text-sm text-gray-600 font-medium">GitHub ID</p>
-                      <p className="text-lg text-gray-900">{user.githubId}</p>
-                    </div>
-                  )}
                   <div className="bg-gray-50 p-4 rounded">
                     <p className="text-sm text-gray-600 font-medium">Email</p>
                     <p className="text-lg text-gray-900">{user.email || 'Not provided'}</p>

@@ -78,17 +78,6 @@ public class UserController {
     }
 
     /**
-     * Get a user by GitHub ID (legacy support)
-     * GET /api/users/github/{githubId}
-     */
-    @GetMapping("/github/{githubId}")
-    public ResponseEntity<UserDTO> getUserByGithubId(@PathVariable String githubId) {
-        return userService.getUserByGithubId(githubId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    /**
      * Get a user by username
      * GET /api/users/username/{username}
      */
@@ -134,16 +123,6 @@ public class UserController {
             @PathVariable String provider,
             @PathVariable String providerId) {
         boolean exists = userService.existsByProviderAndProviderId(provider, providerId);
-        return ResponseEntity.ok(Map.of("exists", exists));
-    }
-
-    /**
-     * Check if a user exists by GitHub ID (legacy support)
-     * GET /api/users/exists/github/{githubId}
-     */
-    @GetMapping("/exists/github/{githubId}")
-    public ResponseEntity<Map<String, Boolean>> checkUserExists(@PathVariable String githubId) {
-        boolean exists = userService.existsByGithubId(githubId);
         return ResponseEntity.ok(Map.of("exists", exists));
     }
 }

@@ -8,7 +8,6 @@ export interface User {
   id: number;
   provider: string;  // 'github', 'google', 'jwt', etc.
   providerId: string;
-  githubId: string | null;  // Legacy field
   username: string;
   email: string;
   name: string | null;
@@ -22,7 +21,6 @@ export interface User {
 export interface CreateUserRequest {
   provider: string;
   providerId: string;
-  githubId?: string;  // Legacy field
   username: string;
   email: string;
   name?: string | null;
@@ -55,23 +53,6 @@ export async function createOrUpdateUser(userData: CreateUserRequest): Promise<U
  */
 export async function getUserByProvider(provider: string, providerId: string): Promise<User | null> {
   const response = await fetch(`${API_BASE_URL}/users/provider/${provider}/${providerId}`);
-
-  if (response.status === 404) {
-    return null;
-  }
-
-  if (!response.ok) {
-    throw new Error(`Failed to get user: ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Get a user by their GitHub ID (legacy support)
- */
-export async function getUserByGithubId(githubId: string): Promise<User | null> {
-  const response = await fetch(`${API_BASE_URL}/users/github/${githubId}`);
 
   if (response.status === 404) {
     return null;
@@ -132,20 +113,6 @@ export async function getUsersByProvider(provider: string): Promise<User[]> {
  */
 export async function checkUserExistsByProvider(provider: string, providerId: string): Promise<boolean> {
   const response = await fetch(`${API_BASE_URL}/users/exists/provider/${provider}/${providerId}`);
-
-  if (!response.ok) {
-    throw new Error(`Failed to check user existence: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data.exists;
-}
-
-/**
- * Check if a user exists by GitHub ID (legacy support)
- */
-export async function checkUserExists(githubId: string): Promise<boolean> {
-  const response = await fetch(`${API_BASE_URL}/users/exists/github/${githubId}`);
 
   if (!response.ok) {
     throw new Error(`Failed to check user existence: ${response.statusText}`);

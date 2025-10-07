@@ -5,7 +5,6 @@ declare module "next-auth" {
     accessToken?: string
     provider?: string
     providerId?: string
-    githubId?: string  // Legacy support
   }
 }
 
@@ -14,6 +13,5 @@ declare module "next-auth/jwt" {
     accessToken?: string
     provider?: string
     providerId?: string
-    githubId?: string  // Legacy support
   }
 }
