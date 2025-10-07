@@ -11,10 +11,7 @@ COPY build.gradle settings.gradle ./
 COPY src ./src
 
 # Build the application and create an executable JAR file
-# --no-daemon is used to prevent the Gradle daemon from running in CI/CD environments
-RUN gradle build --no-daemon
-
-# --- Second Stage: Create the final, smaller image ---
+RUN gradle clean build -x test --no-daemon
 
 # Use a minimal image with just the Java Runtime Environment
 FROM eclipse-temurin:21-jre-jammy
@@ -23,7 +20,7 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Copy the executable JAR from the build stage to the final image
-COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
+COPY --from=build /home/gradle/project/build/libs/GoalsManager-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port the application will run on
 EXPOSE 8080

@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
   backend:
     build:
@@ -29,8 +29,8 @@ services:
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT-SECRET: ${GOOGLE_CLIENT_SECRET}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT-ID: ${GITHUB_CLIENT_ID}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT-SECRET: ${GITHUB_CLIENT_SECRET}
-    volumes:
-      - ./GoalsManager:/app
+    # volumes:
+      # - ./GoalsManager:/app
 
   frontend:
     build:
@@ -40,6 +40,12 @@ services:
       - backend
     ports:
       - "3000:3000"
+    environment:
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      NEXT_PUBLIC_API_URL: http://backend:8080/api
     volumes:
       - ./photon:/app
       - /app/node_modules
@@ -47,5 +53,5 @@ services:
 
 # This top-level 'volumes' key must have no indentation
 volumes:
-  postgres_
+  postgres_data:
 
