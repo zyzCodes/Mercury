@@ -165,17 +165,6 @@ GET    /api/users/provider/{provider}
 GET    /api/users/exists/provider/{provider}/{providerId}
        Checks if user exists for provider
 ```
-
-### Legacy Endpoints (Backward Compatibility)
-
-```
-GET    /api/users/github/{githubId}
-       Gets user by GitHub ID (legacy)
-
-GET    /api/users/exists/github/{githubId}
-       Checks if GitHub user exists (legacy)
-```
-
 ### General Endpoints
 
 ```
