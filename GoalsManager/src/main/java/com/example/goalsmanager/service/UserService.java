@@ -124,8 +124,11 @@ public class UserService {
      * Helper method to update user fields from request
      */
     private void updateUserFromRequest(User user, CreateUserRequest request) {
+        // TODO - don't update incoming data if request is sending NULL objects
         user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
         user.setName(request.getName());
         user.setAvatarUrl(request.getAvatarUrl());
         user.setBio(request.getBio());
