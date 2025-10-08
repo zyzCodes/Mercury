@@ -14,7 +14,6 @@ public class GoalDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private GoalStatus status;
-    private String notes;
     private Long userId;
     private String username;
     private LocalDateTime createdAt;
@@ -26,7 +25,7 @@ public class GoalDTO {
 
     public GoalDTO(Long id, String title, String description, String imageUrl,
                    LocalDate startDate, LocalDate endDate, GoalStatus status,
-                   String notes, Long userId, String username,
+                   Long userId, String username,
                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
@@ -35,7 +34,6 @@ public class GoalDTO {
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
-        this.notes = notes;
         this.userId = userId;
         this.username = username;
         this.createdAt = createdAt;
@@ -97,14 +95,6 @@ public class GoalDTO {
 
     public void setStatus(GoalStatus status) {
         this.status = status;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
     }
 
     public Long getUserId() {

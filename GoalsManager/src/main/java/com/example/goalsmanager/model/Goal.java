@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "goals")
@@ -40,8 +42,8 @@ public class Goal {
     @Column(nullable = false)
     private GoalStatus status = GoalStatus.NOT_STARTED;
 
-    @Column(columnDefinition = "TEXT")
-    private String notes;
+    @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Note> notes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -126,12 +128,23 @@ public class Goal {
         this.status = status;
     }
 
-    public String getNotes() {
+    public List<Note> getNotes() {
         return notes;
     }
 
-    public void setNotes(String notes) {
+    public void setNotes(List<Note> notes) {
         this.notes = notes;
+    }
+
+    // Helper methods for bidirectional relationship
+    public void addNote(Note note) {
+        notes.add(note);
+        note.setGoal(this);
+    }
+
+    public void removeNote(Note note) {
+        notes.remove(note);
+        note.setGoal(null);
     }
 
     public User getUser() {

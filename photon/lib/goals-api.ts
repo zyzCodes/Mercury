@@ -19,7 +19,6 @@ export interface Goal {
   startDate: string; // ISO date string
   endDate: string; // ISO date string
   status: GoalStatus;
-  notes: string | null;
   userId: number;
   username: string;
   createdAt: string;
@@ -33,7 +32,6 @@ export interface CreateGoalRequest {
   startDate: string; // ISO date string (YYYY-MM-DD)
   endDate: string; // ISO date string (YYYY-MM-DD)
   status?: GoalStatus;
-  notes?: string | null;
   userId: number;
 }
 
@@ -44,7 +42,6 @@ export interface UpdateGoalRequest {
   startDate?: string;
   endDate?: string;
   status?: GoalStatus;
-  notes?: string | null;
 }
 
 /**
@@ -130,25 +127,6 @@ export async function updateGoalStatus(id: number, status: GoalStatus): Promise<
 
   if (!response.ok) {
     throw new Error(`Failed to update goal status: ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Update goal notes
- */
-export async function updateGoalNotes(id: number, notes: string): Promise<Goal> {
-  const response = await fetch(`${API_BASE_URL}/goals/${id}/notes`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ notes }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to update goal notes: ${response.statusText}`);
   }
 
   return response.json();

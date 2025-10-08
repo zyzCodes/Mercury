@@ -12,6 +12,7 @@ import {
   type GoalStatus,
   type UpdateGoalRequest 
 } from "@/lib/goals-api"
+import NotesList from "@/components/NotesList"
 import Image from "next/image"
 
 export default function GoalDetailPage() {
@@ -35,7 +36,6 @@ export default function GoalDetailPage() {
     startDate: "",
     endDate: "",
     status: "NOT_STARTED" as GoalStatus,
-    notes: "",
   })
 
   useEffect(() => {
@@ -62,7 +62,6 @@ export default function GoalDetailPage() {
             startDate: data.startDate,
             endDate: data.endDate,
             status: data.status,
-            notes: data.notes || "",
           })
         })
         .catch((err) => setError(err.message))
@@ -84,7 +83,6 @@ export default function GoalDetailPage() {
         startDate: editForm.startDate,
         endDate: editForm.endDate,
         status: editForm.status,
-        notes: editForm.notes || null,
       }
 
       const updatedGoal = await updateGoal(goal.id, updateData)
@@ -228,7 +226,6 @@ export default function GoalDetailPage() {
                         startDate: goal.startDate,
                         endDate: goal.endDate,
                         status: goal.status,
-                        notes: goal.notes || "",
                       })
                     }}
                     className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
@@ -324,7 +321,7 @@ export default function GoalDetailPage() {
 
             {/* Notes Section */}
             <div className="bg-white rounded-xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                   <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
@@ -332,22 +329,7 @@ export default function GoalDetailPage() {
                 Progress Notes & Journal
               </h2>
 
-              {isEditing ? (
-                <textarea
-                  value={editForm.notes}
-                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                  rows={8}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                  placeholder="Add notes about your progress, challenges, lessons learned..."
-                  maxLength={2000}
-                />
-              ) : goal.notes ? (
-                <div className="prose max-w-none">
-                  <p className="text-gray-700 whitespace-pre-wrap">{goal.notes}</p>
-                </div>
-              ) : (
-                <p className="text-gray-500 italic">No notes yet. Click Edit to add your first note!</p>
-              )}
+              <NotesList goalId={goal.id} />
             </div>
           </div>
 

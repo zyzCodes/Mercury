@@ -192,24 +192,6 @@ public class GoalController {
     }
 
     /**
-     * Update goal notes
-     * PATCH /api/goals/{id}/notes
-     */
-    @PatchMapping("/{id}/notes")
-    public ResponseEntity<?> updateGoalNotes(
-            @PathVariable Long id,
-            @RequestBody Map<String, String> request) {
-        try {
-            String notes = request.get("notes");
-            GoalDTO goal = goalService.updateGoalNotes(id, notes);
-            return ResponseEntity.ok(goal);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(createErrorResponse(e.getMessage()));
-        }
-    }
-
-    /**
      * Delete a goal
      * DELETE /api/goals/{id}
      */

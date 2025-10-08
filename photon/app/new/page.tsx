@@ -6,7 +6,7 @@ import { useUser } from "@/hooks/useUser"
 import { createGoal, type CreateGoalRequest } from "@/lib/goals-api"
 import Image from "next/image"
 
-type Step = 1 | 2 | 3 | 4 | 5 | 6;
+type Step = 1 | 2 | 3 | 4 | 5;
 
 interface GoalFormData {
   title: string;
@@ -14,7 +14,6 @@ interface GoalFormData {
   imageUrl: string;
   startDate: string;
   endDate: string;
-  notes: string;
 }
 
 export default function NewGoalPage() {
@@ -30,7 +29,6 @@ export default function NewGoalPage() {
     imageUrl: "",
     startDate: "",
     endDate: "",
-    notes: "",
   })
 
   useEffect(() => {
@@ -47,7 +45,7 @@ export default function NewGoalPage() {
     )
   }
 
-  const totalSteps = 6;
+  const totalSteps = 5;
   const progress = (currentStep / totalSteps) * 100;
 
   const handleNext = () => {
@@ -77,8 +75,6 @@ export default function NewGoalPage() {
       case 4:
         return formData.startDate && formData.endDate && formData.startDate <= formData.endDate
       case 5:
-        return true // Notes are optional
-      case 6:
         return true // Review step
       default:
         return false
@@ -98,7 +94,6 @@ export default function NewGoalPage() {
         imageUrl: formData.imageUrl || null,
         startDate: formData.startDate,
         endDate: formData.endDate,
-        notes: formData.notes || null,
         userId: user.id,
       }
 
@@ -318,42 +313,8 @@ export default function NewGoalPage() {
             </div>
           )}
 
-          {/* Step 5: Initial Notes */}
+          {/* Step 5: Review & Submit */}
           {currentStep === 5 && (
-            <div className="space-y-6 animate-fadeIn">
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                  Any initial thoughts? 💭
-                </h1>
-                <p className="text-lg text-gray-600">
-                  Jot down your first ideas or plans (optional)
-                </p>
-              </div>
-
-              <div>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="What are your initial thoughts? What's your strategy? Any challenges you foresee?"
-                  rows={8}
-                  className="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition outline-none resize-none"
-                  maxLength={1000}
-                />
-                <div className="mt-2 text-right text-sm text-gray-500">
-                  {formData.notes.length}/1000 characters
-                </div>
-              </div>
-
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <p className="text-sm text-purple-800">
-                  📖 You can add more notes anytime as you work toward your goal!
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Step 6: Review */}
-          {currentStep === 6 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
@@ -418,13 +379,6 @@ export default function NewGoalPage() {
                   </div>
                 </div>
 
-                {/* Notes */}
-                {formData.notes && (
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <h3 className="text-sm font-medium text-gray-600 mb-2">Initial Notes</h3>
-                    <p className="text-gray-900 whitespace-pre-wrap">{formData.notes}</p>
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -440,7 +394,7 @@ export default function NewGoalPage() {
             </button>
 
             <div className="flex gap-3">
-              {currentStep !== 1 && currentStep !== 4 && currentStep !== 6 && (
+              {currentStep !== 1 && currentStep !== 4 && currentStep !== 5 && (
                 <button
                   onClick={handleSkip}
                   className="px-6 py-3 text-gray-600 font-medium rounded-lg hover:bg-gray-100 transition"

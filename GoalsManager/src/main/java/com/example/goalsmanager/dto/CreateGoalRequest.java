@@ -23,8 +23,6 @@ public class CreateGoalRequest {
 
     private GoalStatus status;
 
-    private String notes;
-
     @NotNull(message = "User ID is required")
     private Long userId;
 
@@ -88,14 +86,6 @@ public class CreateGoalRequest {
 
     public void setStatus(GoalStatus status) {
         this.status = status;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
     }
 
     public Long getUserId() {
