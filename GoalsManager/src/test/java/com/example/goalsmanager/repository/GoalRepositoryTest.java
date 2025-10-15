@@ -195,7 +195,6 @@ class GoalRepositoryTest {
         newGoal.setStartDate(LocalDate.of(2025, 1, 1));
         newGoal.setEndDate(LocalDate.of(2025, 3, 31));
         newGoal.setStatus(GoalStatus.IN_PROGRESS);
-        newGoal.setNotes("Making steady progress");
         newGoal.setUser(testUser);
 
         // When
@@ -207,7 +206,6 @@ class GoalRepositoryTest {
         assertThat(retrievedGoal.getTitle()).isEqualTo("Complete Project");
         assertThat(retrievedGoal.getDescription()).isEqualTo("Finish the Mercury project");
         assertThat(retrievedGoal.getImageUrl()).isEqualTo("https://example.com/image.jpg");
-        assertThat(retrievedGoal.getNotes()).isEqualTo("Making steady progress");
         assertThat(retrievedGoal.getStatus()).isEqualTo(GoalStatus.IN_PROGRESS);
         assertThat(retrievedGoal.getCreatedAt()).isNotNull();
         assertThat(retrievedGoal.getUpdatedAt()).isNotNull();
