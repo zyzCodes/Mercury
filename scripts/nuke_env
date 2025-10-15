@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Nuke the entire environment and start fresh
+# WARNING: This will delete all database data and volumes!
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+cd "$PROJECT_ROOT"
+
+echo "⚠️  WARNING: DESTRUCTIVE OPERATION ⚠️"
+echo ""
+echo "This script will:"
+echo "  • Stop all Mercury containers"
+echo "  • Remove all containers"
+echo "  • Delete all volumes (including database data)"
+echo "  • Remove all images"
+echo "  • Start fresh containers"
+echo ""
+echo "🔥 ALL DATABASE DATA WILL BE PERMANENTLY DELETED! 🔥"
+echo ""
+read -p "Are you absolutely sure you want to continue? (type 'yes' to confirm): " confirmation
+
+if [ "$confirmation" != "yes" ]; then
+    echo ""
+    echo "❌ Operation cancelled. Nothing was changed."
+    exit 0
+fi
+
+echo ""
+echo "💥 Nuking the environment..."
+echo ""
+
+echo "1️⃣  Stopping containers..."
+docker-compose down
+
+echo "2️⃣  Removing containers..."
+docker-compose rm -f
+
+echo "3️⃣  Removing volumes (this deletes all data)..."
+docker-compose down -v
+
+echo "4️⃣  Removing images..."
+docker-compose down --rmi all || echo "   Note: Some images may still be in use"
+
+echo "5️⃣  Starting fresh containers..."
+docker-compose up -d --build
+
+echo ""
+echo "✅ Environment nuked and rebuilt successfully!"
+echo ""
+echo "Services available at:"
+echo "  Frontend:  http://localhost:3000"
+echo "  Backend:   http://localhost:8080"
+echo "  Database:  localhost:5432 (fresh, empty database)"
+echo ""
+echo "Note: You're starting with a completely fresh database."
+
