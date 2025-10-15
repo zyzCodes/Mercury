@@ -11,6 +11,7 @@ public class TaskDTO {
     private LocalDate date;
     private Long habitId;
     private String habitName;
+    private String color;
     private Long userId;
     private String username;
     private LocalDateTime createdAt;
@@ -21,7 +22,7 @@ public class TaskDTO {
     }
 
     public TaskDTO(Long id, String name, Boolean completed, LocalDate date,
-                   Long habitId, String habitName, Long userId, String username,
+                   Long habitId, String habitName, String color, Long userId, String username,
                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
@@ -29,6 +30,7 @@ public class TaskDTO {
         this.date = date;
         this.habitId = habitId;
         this.habitName = habitName;
+        this.color = color;
         this.userId = userId;
         this.username = username;
         this.createdAt = createdAt;
@@ -82,6 +84,14 @@ public class TaskDTO {
 
     public void setHabitName(String habitName) {
         this.habitName = habitName;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public Long getUserId() {

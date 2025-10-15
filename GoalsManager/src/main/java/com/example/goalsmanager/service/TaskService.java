@@ -227,6 +227,7 @@ public class TaskService {
                 task.getDate(),
                 task.getHabit().getId(),
                 task.getHabit().getName(),
+                task.getHabit().getColor(),
                 task.getUser().getId(),
                 task.getUser().getUsername(),
                 task.getCreatedAt(),
