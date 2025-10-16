@@ -94,7 +94,7 @@ export default function Navbar({
   // Default variant for main pages (dashboard, tasks, etc.)
   return (
     <nav className="bg-white shadow sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-12 xl:px-16">
         <div className="flex justify-between h-16">
           {/* Left side - Logo and Nav Links */}
           <div className="flex items-center space-x-8">
@@ -133,23 +133,34 @@ export default function Navbar({
             )}
           </div>
 
-          {/* Right side - User info and Sign out (Desktop) */}
+          {/* Right side - Action buttons, User info and Sign out (Desktop) */}
           <div className="hidden md:flex items-center space-x-4">
-            {user && (
-              <div className="flex items-center space-x-3">
-                {user.avatarUrl && (
-                  <Image
-                    src={user.avatarUrl}
-                    alt="Profile"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8 rounded-full border-2 border-gray-200"
-                  />
-                )}
-                <span className="text-sm text-gray-700">
-                  {user.name || user.username || user.email}
-                </span>
-              </div>
+            <button
+              onClick={() => handleNavigation('/tasks')}
+              className="bg-white text-blue-600 border-2 border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span className="text-sm font-medium">Weekly Tasks</span>
+            </button>
+            <button
+              onClick={() => handleNavigation('/new')}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="text-sm font-medium">New Goal</span>
+            </button>
+            {user && user.avatarUrl && (
+              <Image
+                src={user.avatarUrl}
+                alt="Profile"
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-full border-2 border-gray-200"
+              />
             )}
             <button
               onClick={handleSignOut}
@@ -203,7 +214,7 @@ export default function Navbar({
       {/* Mobile menu overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -287,6 +298,28 @@ export default function Navbar({
                 Tasks
               </button>
             )}
+
+            {/* Action buttons in mobile menu */}
+            <div className="pt-4 border-t border-gray-200 space-y-2">
+              <button
+                onClick={() => handleNavigation("/tasks")}
+                className="w-full bg-white text-blue-600 border-2 border-blue-600 px-4 py-3 rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span className="font-medium">Weekly Tasks</span>
+              </button>
+              <button
+                onClick={() => handleNavigation("/new")}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="font-medium">New Goal</span>
+              </button>
+            </div>
           </div>
 
           {/* Sign out button */}

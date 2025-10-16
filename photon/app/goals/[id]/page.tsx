@@ -489,7 +489,7 @@ export default function GoalDetailPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
             <div className="text-center">
               <div className="text-6xl mb-4">⚠️</div>
