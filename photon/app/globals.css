@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-typewriter: var(--font-jetbrains-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -111,4 +112,9 @@ body {
 
 .animate-modal-content {
   animation: modal-scale-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Typewriter font utility class */
+.font-typewriter {
+  font-family: var(--font-jetbrains-mono), 'Courier New', monospace;
 }
