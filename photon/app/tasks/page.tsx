@@ -9,7 +9,7 @@ import HabitsList from "@/components/HabitsList"
 import CreateHabitModal from "@/components/CreateHabitModal"
 import { Habit, Task } from "@/types/habits"
 import { getHabitsByUserId } from "@/lib/habits-api"
-import { getTasksByUserId } from "@/lib/tasks-api"
+import { getTasksByUserId, toggleTaskCompletion } from "@/lib/tasks-api"
 
 export default function TasksPage() {
   const { user, loading, isAuthenticated } = useUser()
@@ -74,9 +74,32 @@ export default function TasksPage() {
     // TODO: Add task management functionality
   }
 
-  const handleTaskClick = (task: Task) => {
-    console.log('Task clicked:', task)
-    // TODO: Add task click functionality (toggle completion)
+  const handleTaskClick = async (task: Task) => {
+    try {
+      // Optimistically update the UI
+      setTasks(prevTasks =>
+        prevTasks.map(t =>
+          t.id === task.id ? { ...t, completed: !t.completed } : t
+        )
+      )
+
+      // Call API to toggle completion (this also updates the streak on backend)
+      await toggleTaskCompletion(task.id)
+      
+      // Refetch habits to get updated streaks
+      if (user?.id) {
+        const updatedHabits = await getHabitsByUserId(user.id)
+        setHabits(updatedHabits)
+      }
+    } catch (error) {
+      console.error('Failed to toggle task completion:', error)
+      // Revert the optimistic update on error
+      setTasks(prevTasks =>
+        prevTasks.map(t =>
+          t.id === task.id ? { ...t, completed: task.completed } : t
+        )
+      )
+    }
   }
 
   const handleHabitClick = (habit: Habit) => {

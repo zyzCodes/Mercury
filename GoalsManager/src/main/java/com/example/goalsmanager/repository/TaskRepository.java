@@ -21,6 +21,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByHabitId(Long habitId);
 
     /**
+     * Find tasks for a habit up to and including a date, ordered by date descending
+     */
+    List<Task> findByHabitIdAndDateLessThanEqualOrderByDateDesc(Long habitId, LocalDate date);
+
+    /**
      * Find tasks by user ID and habit ID
      */
     List<Task> findByUserIdAndHabitId(Long userId, Long habitId);

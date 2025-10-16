@@ -171,15 +171,63 @@ public class TaskService {
     }
 
     /**
-     * Toggle task completion status
+     * Toggle task completion status and update habit streak
      */
     public TaskDTO toggleTaskCompletion(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
-        
+
         task.setCompleted(!task.getCompleted());
         Task updatedTask = taskRepository.save(task);
+        
+        // Update habit streak after toggling task
+        updateHabitStreak(task.getHabit());
+        
         return convertToDTO(updatedTask);
+    }
+    
+    /**
+     * Calculate and update habit streak based on completed tasks
+     * Only looks at actual scheduled tasks, not arbitrary days
+     */
+    private void updateHabitStreak(Habit habit) {
+        LocalDate today = LocalDate.now();
+        
+        // Get all past tasks (from start date to today) ordered by date descending (newest first)
+        List<Task> pastTasks = taskRepository.findByHabitIdAndDateLessThanEqualOrderByDateDesc(
+            habit.getId(), today
+        );
+        
+        if (pastTasks.isEmpty()) {
+            habit.setStreakStatus(0);
+            habitRepository.save(habit);
+            return;
+        }
+        
+        // Check the most recent task
+        Task mostRecentTask = pastTasks.get(0);
+        
+        // If the last task was not completed, streak is 0
+        if (!mostRecentTask.getCompleted()) {
+            habit.setStreakStatus(0);
+            habitRepository.save(habit);
+            return;
+        }
+        
+        // Count backwards from the most recent task
+        // Keep counting as long as tasks are completed
+        int streak = 0;
+        for (Task task : pastTasks) {
+            if (task.getCompleted()) {
+                streak++;
+            } else {
+                // Found an incomplete task, stop counting
+                break;
+            }
+        }
+        
+        habit.setStreakStatus(streak);
+        habitRepository.save(habit);
     }
 
     /**
