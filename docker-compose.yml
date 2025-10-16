@@ -47,6 +47,7 @@ services:
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       NEXT_PUBLIC_API_URL: http://localhost:8080/api
       API_URL: http://backend:8080/api
+      NEXT_PUBLIC_OPENAI_API_KEY: ${NEXT_PUBLIC_OPENAI_API_KEY}
     volumes:
       - ./photon:/app
       - /app/node_modules

@@ -1,15 +1,15 @@
 "use client"
 
-import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useMemo } from "react"
 import { useUser } from "@/hooks/useUser"
+import Navbar from "@/components/Navbar"
 import WeeklyCalendar from "@/components/WeeklyCalendar"
 import HabitsList from "@/components/HabitsList"
 import CreateHabitModal from "@/components/CreateHabitModal"
 import { Habit, Task } from "@/types/habits"
 import { getHabitsByUserId } from "@/lib/habits-api"
-import { getTasksByUserId, toggleTaskCompletion } from "@/lib/tasks-api"
+import { getTasksByDateRange, toggleTaskCompletion } from "@/lib/tasks-api"
 
 export default function TasksPage() {
   const { user, loading, isAuthenticated } = useUser()
@@ -20,7 +20,15 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [dataLoading, setDataLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
+    const now = new Date()
+    const dayOfWeek = now.getDay()
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - dayOfWeek)
+    startOfWeek.setHours(0, 0, 0, 0)
+    return startOfWeek
+  })
+
   // UI state
   const [showCreateModal, setShowCreateModal] = useState(false)
 
@@ -33,17 +41,24 @@ export default function TasksPage() {
     if (user?.id) {
       fetchData()
     }
-  }, [user?.id])
+  }, [user?.id, currentWeekStart])
 
   const fetchData = async () => {
     if (!user?.id) return
-    
+
     setDataLoading(true)
     setError(null)
     try {
+      const endOfWeek = new Date(currentWeekStart)
+      endOfWeek.setDate(currentWeekStart.getDate() + 6)
+      endOfWeek.setHours(23, 59, 59, 999)
+
+      const startDateStr = currentWeekStart.toISOString().split('T')[0]
+      const endDateStr = endOfWeek.toISOString().split('T')[0]
+
       const [habitsData, tasksData] = await Promise.all([
         getHabitsByUserId(user.id),
-        getTasksByUserId(user.id),
+        getTasksByDateRange(user.id, startDateStr, endDateStr),
       ])
       setHabits(habitsData)
       setTasks(tasksData)
@@ -111,6 +126,10 @@ export default function TasksPage() {
     fetchData() // Refresh data after creating habit
   }
 
+  const handleWeekChange = (newWeekStart: Date) => {
+    setCurrentWeekStart(newWeekStart)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -125,41 +144,7 @@ export default function TasksPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-xl font-semibold text-gray-900">Mercury</h1>
-              <div className="hidden md:flex space-x-4">
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition"
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => router.push('/tasks')}
-                  className="text-blue-600 border-b-2 border-blue-600 px-3 py-2 text-sm font-medium"
-                >
-                  Tasks
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                {user?.name || user?.username}
-              </span>
-              <button
-                onClick={() => signOut({ callbackUrl: '/login' })}
-                className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="default" user={user || undefined} showNavLinks />
 
       {/* Main Content */}
       <main className="w-full py-6 px-4 sm:px-6 lg:px-8">
@@ -242,10 +227,12 @@ export default function TasksPage() {
 
                 {/* Weekly Calendar */}
                 <div className="lg:col-span-9">
-                  <WeeklyCalendar 
+                  <WeeklyCalendar
+                    startDate={currentWeekStart}
                     onDayClick={handleDayClick}
                     tasks={tasksByDate}
                     onTaskClick={handleTaskClick}
+                    onWeekChange={handleWeekChange}
                   />
                 </div>
               </div>

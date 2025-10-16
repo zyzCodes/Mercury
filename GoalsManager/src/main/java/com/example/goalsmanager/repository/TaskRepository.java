@@ -54,5 +54,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
      * Count tasks by habit ID
      */
     long countByHabitId(Long habitId);
+
+    /**
+     * Check if a task exists for a specific habit and date
+     */
+    boolean existsByHabitIdAndDate(Long habitId, LocalDate date);
 }
 

@@ -21,6 +21,10 @@ interface WeeklyCalendarProps {
    * Callback when a task is clicked
    */
   onTaskClick?: (task: Task) => void
+  /**
+   * Callback when week navigation changes (returns the new week start date)
+   */
+  onWeekChange?: (startDate: Date) => void
 }
 
 interface DayInfo {
@@ -32,11 +36,12 @@ interface DayInfo {
   isWeekend: boolean
 }
 
-export default function WeeklyCalendar({ 
-  startDate, 
+export default function WeeklyCalendar({
+  startDate,
   onDayClick,
   tasks = {},
-  onTaskClick
+  onTaskClick,
+  onWeekChange
 }: WeeklyCalendarProps) {
   const weekDays = useMemo(() => {
     const days: DayInfo[] = []
@@ -91,14 +96,67 @@ export default function WeeklyCalendar({
     return tasks[dateKey] || []
   }
 
+  const handlePreviousWeek = () => {
+    const currentStart = weekDays[0].date
+    const newStart = new Date(currentStart)
+    newStart.setDate(currentStart.getDate() - 7)
+    onWeekChange?.(newStart)
+  }
+
+  const handleNextWeek = () => {
+    const currentStart = weekDays[0].date
+    const newStart = new Date(currentStart)
+    newStart.setDate(currentStart.getDate() + 7)
+    onWeekChange?.(newStart)
+  }
+
+  const handleToday = () => {
+    const now = new Date()
+    const dayOfWeek = now.getDay()
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - dayOfWeek)
+    startOfWeek.setHours(0, 0, 0, 0)
+    onWeekChange?.(startOfWeek)
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 sm:px-6 py-4">
-        <h3 className="text-white text-lg font-semibold">{currentMonthYear}</h3>
-        <p className="text-blue-100 text-sm">
-          Week of {weekDays[0].date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-white text-lg font-semibold">{currentMonthYear}</h3>
+            <p className="text-blue-100 text-sm">
+              Week of {weekDays[0].date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePreviousWeek}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition text-white"
+              aria-label="Previous week"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={handleToday}
+              className="hidden sm:block px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition text-white text-sm font-medium"
+            >
+              Today
+            </button>
+            <button
+              onClick={handleNextWeek}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition text-white"
+              aria-label="Next week"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Weekly Columnar View */}

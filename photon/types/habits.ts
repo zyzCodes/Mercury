@@ -63,3 +63,16 @@ export interface UpdateTaskRequest {
   date?: string
 }
 
+export interface AIHabitRecommendation {
+  name: string
+  description: string
+  daysOfWeek: string[]
+  rationale: string
+  accepted: boolean // UI state for user accept/deny
+}
+
+export interface AIRecommendationResponse {
+  reasoning: string
+  habits: Omit<AIHabitRecommendation, 'accepted'>[]
+}
+

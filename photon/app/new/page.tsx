@@ -4,9 +4,12 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/hooks/useUser"
 import { createGoal, type CreateGoalRequest } from "@/lib/goals-api"
+import { createHabit } from "@/lib/habits-api"
+import { generateHabitRecommendations } from "@/lib/openai-api"
+import { AIHabitRecommendation } from "@/types/habits"
 import Image from "next/image"
 
-type Step = 1 | 2 | 3 | 4 | 5;
+type Step = 1 | 2 | 3 | 4 | 5 | 6;
 
 interface GoalFormData {
   title: string;
@@ -31,11 +34,26 @@ export default function NewGoalPage() {
     endDate: "",
   })
 
+  // AI recommendations state
+  const [aiRecommendations, setAiRecommendations] = useState<AIHabitRecommendation[]>([])
+  const [aiReasoning, setAiReasoning] = useState<string>("")
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState<string | null>(null)
+  const [aiSkipped, setAiSkipped] = useState(false)
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/login')
     }
   }, [isAuthenticated, loading, router])
+
+  // Fetch AI recommendations when entering step 5
+  useEffect(() => {
+    if (currentStep === 5 && !aiLoading && !aiSkipped && aiRecommendations.length === 0) {
+      fetchAiRecommendations()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep])
 
   if (loading || !isAuthenticated) {
     return (
@@ -45,8 +63,34 @@ export default function NewGoalPage() {
     )
   }
 
-  const totalSteps = 5;
+  const totalSteps = 6;
   const progress = (currentStep / totalSteps) * 100;
+
+  const fetchAiRecommendations = async () => {
+    setAiLoading(true)
+    setAiError(null)
+
+    try {
+      const response = await generateHabitRecommendations(formData.title, formData.description)
+      setAiReasoning(response.reasoning)
+      setAiRecommendations(response.habits.map(h => ({ ...h, accepted: true })))
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'Failed to generate recommendations')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  const toggleHabitAcceptance = (index: number) => {
+    setAiRecommendations(prev =>
+      prev.map((habit, i) => i === index ? { ...habit, accepted: !habit.accepted } : habit)
+    )
+  }
+
+  const skipAiRecommendations = () => {
+    setAiSkipped(true)
+    handleNext()
+  }
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
@@ -75,6 +119,8 @@ export default function NewGoalPage() {
       case 4:
         return formData.startDate && formData.endDate && formData.startDate <= formData.endDate
       case 5:
+        return !aiLoading // Can proceed when AI is done loading (or if skipped/errored)
+      case 6:
         return true // Review step
       default:
         return false
@@ -88,6 +134,7 @@ export default function NewGoalPage() {
     setError(null)
 
     try {
+      // Step 1: Create the goal
       const goalData: CreateGoalRequest = {
         title: formData.title,
         description: formData.description || null,
@@ -97,7 +144,33 @@ export default function NewGoalPage() {
         userId: user.id,
       }
 
-      await createGoal(goalData)
+      const createdGoal = await createGoal(goalData)
+
+      // Step 2: Create accepted AI-recommended habits
+      const acceptedHabits = aiRecommendations.filter(h => h.accepted)
+      const habitColors = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EC4899', '#EF4444', '#06B6D4']
+
+      const habitCreationPromises = acceptedHabits.map((habit, index) =>
+        createHabit({
+          name: habit.name,
+          description: habit.description,
+          daysOfWeek: habit.daysOfWeek.join(', '),
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          color: habitColors[index % habitColors.length],
+          goalId: createdGoal.id,
+          userId: user.id,
+        })
+      )
+
+      // Create all habits in parallel, but don't fail the whole operation if some fail
+      const results = await Promise.allSettled(habitCreationPromises)
+      const failedCount = results.filter(r => r.status === 'rejected').length
+
+      if (failedCount > 0) {
+        console.warn(`${failedCount} habit(s) failed to create`)
+      }
+
       router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create goal')
@@ -313,8 +386,147 @@ export default function NewGoalPage() {
             </div>
           )}
 
-          {/* Step 5: Review & Submit */}
+          {/* Step 5: AI Habit Recommendations */}
           {currentStep === 5 && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                  AI-Powered Habit Suggestions 🤖
+                </h1>
+                <p className="text-lg text-gray-600">
+                  Let AI help you build habits to achieve your goal
+                </p>
+              </div>
+
+              {/* Loading State */}
+              {aiLoading && (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
+                  <p className="text-gray-600 text-lg">Generating personalized recommendations...</p>
+                  <p className="text-gray-500 text-sm mt-2">This may take a few seconds</p>
+                </div>
+              )}
+
+              {/* Error State */}
+              {aiError && !aiLoading && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+                  <div className="flex items-start gap-4">
+                    <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-red-900 mb-2">
+                        AI Recommendations Unavailable
+                      </h3>
+                      <p className="text-red-700 mb-4">{aiError}</p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={fetchAiRecommendations}
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+                        >
+                          Try Again
+                        </button>
+                        <button
+                          onClick={skipAiRecommendations}
+                          className="px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition font-medium"
+                        >
+                          Skip AI Recommendations
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* AI Recommendations */}
+              {!aiLoading && !aiError && aiRecommendations.length > 0 && (
+                <div className="space-y-6">
+                  {/* AI Reasoning */}
+                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-6">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="text-3xl">🤖</div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-lg">AI Strategy</h3>
+                        <p className="text-gray-700 mt-2">{aiReasoning}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Habit Recommendations */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Recommended Habits ({aiRecommendations.filter(h => h.accepted).length} selected)
+                    </h3>
+                    <div className="space-y-4">
+                      {aiRecommendations.map((habit, index) => (
+                        <div
+                          key={index}
+                          className={`border-2 rounded-xl p-5 transition-all cursor-pointer ${
+                            habit.accepted
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 bg-gray-50 opacity-60'
+                          }`}
+                          onClick={() => toggleHabitAcceptance(index)}
+                        >
+                          <div className="flex items-start gap-4">
+                            {/* Checkbox */}
+                            <div className="flex-shrink-0 mt-1">
+                              <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
+                                habit.accepted
+                                  ? 'bg-blue-600 border-blue-600'
+                                  : 'bg-white border-gray-300'
+                              }`}>
+                                {habit.accepted && (
+                                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Habit Content */}
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 text-lg mb-2">{habit.name}</h4>
+                              <p className="text-gray-700 mb-3">{habit.description}</p>
+
+                              {/* Days of Week */}
+                              <div className="flex flex-wrap gap-2 mb-3">
+                                {habit.daysOfWeek.map((day) => (
+                                  <span
+                                    key={day}
+                                    className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full"
+                                  >
+                                    {day}
+                                  </span>
+                                ))}
+                              </div>
+
+                              {/* Rationale */}
+                              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                <p className="text-sm text-gray-600">
+                                  <span className="font-medium text-gray-900">Why this helps:</span> {habit.rationale}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Info Box */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      💡 <strong>Tip:</strong> Click on any habit to accept or reject it. You can always add more habits later from your goal page.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 6: Review & Submit */}
+          {currentStep === 6 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
@@ -360,25 +572,54 @@ export default function NewGoalPage() {
                   <div>
                     <h3 className="text-sm font-medium text-gray-600 mb-2">Start Date</h3>
                     <p className="text-lg font-medium text-gray-900">
-                      {new Date(formData.startDate).toLocaleDateString('en-US', { 
-                        month: 'long', 
-                        day: 'numeric', 
-                        year: 'numeric' 
+                      {new Date(formData.startDate).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
                       })}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-600 mb-2">Target End Date</h3>
                     <p className="text-lg font-medium text-gray-900">
-                      {new Date(formData.endDate).toLocaleDateString('en-US', { 
-                        month: 'long', 
-                        day: 'numeric', 
-                        year: 'numeric' 
+                      {new Date(formData.endDate).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
                       })}
                     </p>
                   </div>
                 </div>
 
+                {/* Accepted AI Habits */}
+                {aiRecommendations.filter(h => h.accepted).length > 0 && (
+                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-2xl">🤖</span>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        AI-Recommended Habits ({aiRecommendations.filter(h => h.accepted).length})
+                      </h3>
+                    </div>
+                    <div className="space-y-3">
+                      {aiRecommendations.filter(h => h.accepted).map((habit, index) => (
+                        <div key={index} className="bg-white rounded-lg p-4 border border-blue-200">
+                          <h4 className="font-semibold text-gray-900 mb-2">{habit.name}</h4>
+                          <p className="text-sm text-gray-700 mb-2">{habit.description}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {habit.daysOfWeek.map((day) => (
+                              <span
+                                key={day}
+                                className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded"
+                              >
+                                {day}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -394,7 +635,7 @@ export default function NewGoalPage() {
             </button>
 
             <div className="flex gap-3">
-              {currentStep !== 1 && currentStep !== 4 && currentStep !== 5 && (
+              {currentStep !== 1 && currentStep !== 4 && currentStep !== 5 && currentStep !== 6 && (
                 <button
                   onClick={handleSkip}
                   className="px-6 py-3 text-gray-600 font-medium rounded-lg hover:bg-gray-100 transition"
