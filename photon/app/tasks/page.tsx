@@ -1,9 +1,9 @@
 "use client"
 
-import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useMemo } from "react"
 import { useUser } from "@/hooks/useUser"
+import Navbar from "@/components/Navbar"
 import WeeklyCalendar from "@/components/WeeklyCalendar"
 import HabitsList from "@/components/HabitsList"
 import CreateHabitModal from "@/components/CreateHabitModal"
@@ -125,41 +125,7 @@ export default function TasksPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-xl font-semibold text-gray-900">Mercury</h1>
-              <div className="hidden md:flex space-x-4">
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition"
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => router.push('/tasks')}
-                  className="text-blue-600 border-b-2 border-blue-600 px-3 py-2 text-sm font-medium"
-                >
-                  Tasks
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                {user?.name || user?.username}
-              </span>
-              <button
-                onClick={() => signOut({ callbackUrl: '/login' })}
-                className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="default" user={user || undefined} showNavLinks />
 
       {/* Main Content */}
       <main className="w-full py-6 px-4 sm:px-6 lg:px-8">

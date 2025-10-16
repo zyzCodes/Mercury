@@ -18,7 +18,7 @@ export default function HabitsList({ habits, onHabitClick }: HabitsListProps) {
   }, [])
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hidden lg:block">
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-4">
         <h3 className="text-white text-lg font-semibold">My Habits</h3>
@@ -28,7 +28,7 @@ export default function HabitsList({ habits, onHabitClick }: HabitsListProps) {
       </div>
 
       {/* Habits List */}
-      <div className="p-4 space-y-3 max-h-[600px] overflow-y-auto">
+      <div className="p-4 space-y-3 max-h-[400px] lg:max-h-[600px] overflow-y-auto">
         {habits.length === 0 ? (
           <div className="text-center text-gray-400 py-8 animate-fade-in">
             <svg 
@@ -52,7 +52,7 @@ export default function HabitsList({ habits, onHabitClick }: HabitsListProps) {
               key={habit.id}
               onClick={() => onHabitClick?.(habit)}
               className={`
-                group cursor-pointer hover:scale-102 transition-all duration-300
+                group cursor-pointer hover:scale-[1.02] transition-all duration-300
                 ${isVisible ? 'animate-slide-up-fade-in' : 'opacity-0 translate-y-4'}
               `}
               style={{
