@@ -13,7 +13,7 @@ export default function TaskCard({ name, color, completed = false, onClick }: Ta
       onClick={onClick}
       className={`
         px-3 py-2 rounded-lg text-sm cursor-pointer
-        transition-all hover:shadow-md hover:scale-105
+        transition-all hover:shadow-md hover:scale-105 font-typewriter
         border-l-4 truncate
         ${completed ? 'opacity-60 line-through' : ''}
       `}

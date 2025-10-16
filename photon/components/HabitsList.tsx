@@ -21,8 +21,8 @@ export default function HabitsList({ habits, onHabitClick }: HabitsListProps) {
     <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hidden lg:block">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-4">
-        <h3 className="text-white text-lg font-semibold font-typewriter">My Habits</h3>
-        <p className="text-blue-100 text-sm font-typewriter">
+        <h3 className="text-white text-lg font-semibold">My Habits</h3>
+        <p className="text-blue-100 text-sm">
           {habits.length} habit{habits.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -91,14 +91,14 @@ export default function HabitsList({ habits, onHabitClick }: HabitsListProps) {
                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" 
                     />
                   </svg>
-                  <span className="truncate font-typewriter">{habit.daysOfWeek}</span>
+                  <span className="truncate">{habit.daysOfWeek}</span>
                 </div>
 
                 {/* Streak Status with pulse animation - only show if streak > 0 */}
                 {habit.streakStatus > 0 && (
                   <div className="flex items-center gap-1 text-xs text-gray-700">
                     <span className="inline-block animate-pulse-subtle">🔥</span>
-                    <span className="font-medium font-typewriter">{habit.streakStatus}</span>
+                    <span className="font-medium">{habit.streakStatus}</span>
                   </div>
                 )}
               </div>
