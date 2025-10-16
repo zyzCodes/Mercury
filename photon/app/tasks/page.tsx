@@ -9,7 +9,7 @@ import HabitsList from "@/components/HabitsList"
 import CreateHabitModal from "@/components/CreateHabitModal"
 import { Habit, Task } from "@/types/habits"
 import { getHabitsByUserId } from "@/lib/habits-api"
-import { getTasksByUserId, toggleTaskCompletion } from "@/lib/tasks-api"
+import { getTasksByDateRange, toggleTaskCompletion } from "@/lib/tasks-api"
 
 export default function TasksPage() {
   const { user, loading, isAuthenticated } = useUser()
@@ -20,7 +20,15 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [dataLoading, setDataLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
+    const now = new Date()
+    const dayOfWeek = now.getDay()
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - dayOfWeek)
+    startOfWeek.setHours(0, 0, 0, 0)
+    return startOfWeek
+  })
+
   // UI state
   const [showCreateModal, setShowCreateModal] = useState(false)
 
@@ -33,17 +41,24 @@ export default function TasksPage() {
     if (user?.id) {
       fetchData()
     }
-  }, [user?.id])
+  }, [user?.id, currentWeekStart])
 
   const fetchData = async () => {
     if (!user?.id) return
-    
+
     setDataLoading(true)
     setError(null)
     try {
+      const endOfWeek = new Date(currentWeekStart)
+      endOfWeek.setDate(currentWeekStart.getDate() + 6)
+      endOfWeek.setHours(23, 59, 59, 999)
+
+      const startDateStr = currentWeekStart.toISOString().split('T')[0]
+      const endDateStr = endOfWeek.toISOString().split('T')[0]
+
       const [habitsData, tasksData] = await Promise.all([
         getHabitsByUserId(user.id),
-        getTasksByUserId(user.id),
+        getTasksByDateRange(user.id, startDateStr, endDateStr),
       ])
       setHabits(habitsData)
       setTasks(tasksData)
@@ -109,6 +124,10 @@ export default function TasksPage() {
 
   const handleCreateSuccess = () => {
     fetchData() // Refresh data after creating habit
+  }
+
+  const handleWeekChange = (newWeekStart: Date) => {
+    setCurrentWeekStart(newWeekStart)
   }
 
   if (loading) {
@@ -208,10 +227,12 @@ export default function TasksPage() {
 
                 {/* Weekly Calendar */}
                 <div className="lg:col-span-9">
-                  <WeeklyCalendar 
+                  <WeeklyCalendar
+                    startDate={currentWeekStart}
                     onDayClick={handleDayClick}
                     tasks={tasksByDate}
                     onTaskClick={handleTaskClick}
+                    onWeekChange={handleWeekChange}
                   />
                 </div>
               </div>

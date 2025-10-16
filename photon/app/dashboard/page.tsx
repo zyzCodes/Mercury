@@ -22,6 +22,14 @@ export default function DashboardPage() {
   const [habitsLoading, setHabitsLoading] = useState(true)
   const [tasks, setTasks] = useState<Task[]>([])
   const [tasksLoading, setTasksLoading] = useState(true)
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
+    const now = new Date()
+    const dayOfWeek = now.getDay()
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - dayOfWeek)
+    startOfWeek.setHours(0, 0, 0, 0)
+    return startOfWeek
+  })
 
   useEffect(() => {
     if (loading) return // Still loading
@@ -54,17 +62,11 @@ export default function DashboardPage() {
   useEffect(() => {
     if (user) {
       setTasksLoading(true)
-      const now = new Date()
-      const dayOfWeek = now.getDay()
-      const startOfWeek = new Date(now)
-      startOfWeek.setDate(now.getDate() - dayOfWeek)
-      startOfWeek.setHours(0, 0, 0, 0)
-
-      const endOfWeek = new Date(startOfWeek)
-      endOfWeek.setDate(startOfWeek.getDate() + 6)
+      const endOfWeek = new Date(currentWeekStart)
+      endOfWeek.setDate(currentWeekStart.getDate() + 6)
       endOfWeek.setHours(23, 59, 59, 999)
 
-      const startDateStr = startOfWeek.toISOString().split('T')[0]
+      const startDateStr = currentWeekStart.toISOString().split('T')[0]
       const endDateStr = endOfWeek.toISOString().split('T')[0]
 
       getTasksByDateRange(user.id, startDateStr, endDateStr)
@@ -72,7 +74,7 @@ export default function DashboardPage() {
         .catch((err) => console.error('Failed to load tasks:', err))
         .finally(() => setTasksLoading(false))
     }
-  }, [user])
+  }, [user, currentWeekStart])
 
   // Group tasks by date for the calendar
   const tasksByDate = useMemo(() => {
@@ -121,6 +123,11 @@ export default function DashboardPage() {
     router.push(`/goals/${habit.goalId}`)
   }
 
+  // Handle week change
+  const handleWeekChange = (newWeekStart: Date) => {
+    setCurrentWeekStart(newWeekStart)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -161,9 +168,11 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <WeeklyCalendar
+                  startDate={currentWeekStart}
                   tasks={tasksByDate}
                   onTaskClick={handleTaskClick}
                   onDayClick={(date) => router.push(`/tasks?date=${date.toISOString().split('T')[0]}`)}
+                  onWeekChange={handleWeekChange}
                 />
               )}
             </div>
