@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -108,16 +110,105 @@ public class TaskService {
 
     /**
      * Get tasks by user ID and date range
+     * Automatically generates missing tasks for the user's active habits
      */
-    @Transactional(readOnly = true)
     public List<TaskDTO> getTasksByUserIdAndDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
         }
+
+        // Generate missing tasks for all user's habits in this date range
+        generateMissingTasksForUser(userId, startDate, endDate);
+
+        // Return all tasks in the range (now including generated ones)
         return taskRepository.findByUserIdAndDateBetween(userId, startDate, endDate).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Generate missing tasks for all habits of a user within a date range
+     * This method is idempotent - it only creates tasks that don't already exist
+     */
+    private void generateMissingTasksForUser(Long userId, LocalDate startDate, LocalDate endDate) {
+        // Get all habits for the user
+        List<Habit> userHabits = habitRepository.findByUserId(userId);
+
+        for (Habit habit : userHabits) {
+            generateTasksForHabit(habit, startDate, endDate);
+        }
+    }
+
+    /**
+     * Generate tasks for a specific habit within a date range
+     * Only generates tasks for dates that match the habit's daysOfWeek pattern
+     */
+    private void generateTasksForHabit(Habit habit, LocalDate rangeStart, LocalDate rangeEnd) {
+        // Parse the habit's days of week (e.g., "Mon, Wed, Fri")
+        String[] selectedDays = habit.getDaysOfWeek().split(",\\s*");
+        List<DayOfWeek> habitDays = parseDaysOfWeek(selectedDays);
+
+        if (habitDays.isEmpty()) {
+            return; // No days selected, nothing to generate
+        }
+
+        // Determine the actual start and end dates for task generation
+        // Tasks should only be generated within the habit's active period
+        LocalDate effectiveStart = rangeStart.isBefore(habit.getStartDate()) ? habit.getStartDate() : rangeStart;
+        LocalDate effectiveEnd = rangeEnd.isAfter(habit.getEndDate()) ? habit.getEndDate() : rangeEnd;
+
+        if (effectiveStart.isAfter(effectiveEnd)) {
+            return; // No overlap between range and habit period
+        }
+
+        // Generate tasks for each matching day
+        List<Task> tasksToCreate = new ArrayList<>();
+        LocalDate currentDate = effectiveStart;
+
+        while (!currentDate.isAfter(effectiveEnd)) {
+            // Check if this day matches the habit's schedule
+            if (habitDays.contains(currentDate.getDayOfWeek())) {
+                // Check if task already exists for this date
+                boolean taskExists = taskRepository.existsByHabitIdAndDate(habit.getId(), currentDate);
+
+                if (!taskExists) {
+                    // Create new task
+                    Task task = new Task();
+                    task.setName(habit.getName());
+                    task.setDate(currentDate);
+                    task.setCompleted(false);
+                    task.setHabit(habit);
+                    task.setUser(habit.getUser());
+                    tasksToCreate.add(task);
+                }
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+
+        // Bulk save all tasks
+        if (!tasksToCreate.isEmpty()) {
+            taskRepository.saveAll(tasksToCreate);
+        }
+    }
+
+    /**
+     * Parse day of week strings (Mon, Tue, etc.) into DayOfWeek enum values
+     */
+    private List<DayOfWeek> parseDaysOfWeek(String[] dayStrings) {
+        List<DayOfWeek> days = new ArrayList<>();
+        for (String dayStr : dayStrings) {
+            switch (dayStr.trim()) {
+                case "Mon": days.add(DayOfWeek.MONDAY); break;
+                case "Tue": days.add(DayOfWeek.TUESDAY); break;
+                case "Wed": days.add(DayOfWeek.WEDNESDAY); break;
+                case "Thu": days.add(DayOfWeek.THURSDAY); break;
+                case "Fri": days.add(DayOfWeek.FRIDAY); break;
+                case "Sat": days.add(DayOfWeek.SATURDAY); break;
+                case "Sun": days.add(DayOfWeek.SUNDAY); break;
+            }
+        }
+        return days;
     }
 
     /**

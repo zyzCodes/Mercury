@@ -215,12 +215,18 @@ class TaskControllerTest {
         LocalDate endDate = LocalDate.of(2025, 10, 23);
 
         // When & Then
+        // Note: This endpoint now auto-generates missing tasks for the date range
+        // The habit is Mon,Wed,Fri from 2025-01-01 to 2025-12-31
+        // Date range 2025-10-19 (Sun) to 2025-10-23 (Thu) includes:
+        // - Mon 2025-10-20 (already exists as testTask)
+        // - Wed 2025-10-22 (will be auto-generated)
+        // Total: 2 tasks
         mockMvc.perform(get("/api/tasks/user/{userId}/week", testUser.getId())
                         .param("startDate", startDate.toString())
                         .param("endDate", endDate.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].date").value("2025-10-20"));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[*].date", containsInAnyOrder("2025-10-20", "2025-10-22")));
     }
 
     @Test

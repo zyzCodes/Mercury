@@ -1,9 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { CreateHabitRequest, CreateTaskRequest } from "@/types/habits"
+import { CreateHabitRequest } from "@/types/habits"
 import { createHabit } from "@/lib/habits-api"
-import { createTask } from "@/lib/tasks-api"
 import { getGoalsByUserId, Goal } from "@/lib/goals-api"
 
 interface CreateHabitModalProps {
@@ -33,12 +32,6 @@ const DAYS = [
   { code: "Sun", full: "Sunday" },
 ]
 
-interface AutoTask {
-  date: string
-  dayName: string
-  name: string
-}
-
 export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }: CreateHabitModalProps) {
   // Form state
   const [name, setName] = useState("")
@@ -51,7 +44,6 @@ export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }:
   
   // UI state
   const [goals, setGoals] = useState<Goal[]>([])
-  const [autoTasks, setAutoTasks] = useState<AutoTask[]>([])
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -61,15 +53,6 @@ export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }:
       fetchGoals()
     }
   }, [isOpen, userId])
-
-  // Generate auto tasks when days or dates change
-  useEffect(() => {
-    if (selectedDays.length > 0 && startDate) {
-      generateAutoTasks()
-    } else {
-      setAutoTasks([])
-    }
-  }, [selectedDays, startDate, name])
 
   const fetchGoals = async () => {
     try {
@@ -83,46 +66,11 @@ export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }:
     }
   }
 
-  const generateAutoTasks = () => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    // Get start of current week (Sunday)
-    const startOfWeek = new Date(today)
-    const dayOfWeek = startOfWeek.getDay()
-    startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek)
-    
-    // Generate tasks for this week
-    const tasks: AutoTask[] = []
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek)
-      date.setDate(startOfWeek.getDate() + i)
-      
-      const dayCode = DAYS[i].code
-      if (selectedDays.includes(dayCode)) {
-        const dateStr = date.toISOString().split('T')[0]
-        tasks.push({
-          date: dateStr,
-          dayName: DAYS[i].full,
-          name: name ? `${name} - ${DAYS[i].full}` : `Task - ${DAYS[i].full}`
-        })
-      }
-    }
-    
-    setAutoTasks(tasks)
-  }
-
   const toggleDay = (dayCode: string) => {
     setSelectedDays(prev =>
       prev.includes(dayCode)
         ? prev.filter(d => d !== dayCode)
         : [...prev, dayCode]
-    )
-  }
-
-  const updateTaskName = (index: number, newName: string) => {
-    setAutoTasks(prev =>
-      prev.map((task, i) => (i === index ? { ...task, name: newName } : task))
     )
   }
 
@@ -145,7 +93,7 @@ export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }:
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validate() || !goalId) return
 
     setLoading(true)
@@ -162,21 +110,9 @@ export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }:
         userId,
       }
 
-      const createdHabit = await createHabit(habitData)
+      await createHabit(habitData)
 
-      // Create tasks
-      const taskPromises = autoTasks.map(task => {
-        const taskData: CreateTaskRequest = {
-          name: task.name,
-          date: task.date,
-          habitId: createdHabit.id,
-          userId,
-        }
-        return createTask(taskData)
-      })
-
-      await Promise.all(taskPromises)
-
+      // Tasks will be generated automatically when user views calendar weeks
       // Success!
       onSuccess()
       handleClose()
@@ -197,7 +133,6 @@ export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }:
     setSelectedDays([])
     setStartDate("")
     setEndDate("")
-    setAutoTasks([])
     setErrors({})
     onClose()
   }
@@ -354,31 +289,6 @@ export default function CreateHabitModal({ isOpen, onClose, userId, onSuccess }:
                 {errors.endDate && <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>}
               </div>
             </div>
-
-            {/* Auto-generated Tasks */}
-            {autoTasks.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tasks for This Week ({autoTasks.length})
-                </label>
-                <div className="space-y-2 max-h-48 overflow-y-auto p-3 bg-gray-50 rounded-lg">
-                  {autoTasks.map((task, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 w-24">{task.dayName}</span>
-                      <input
-                        type="text"
-                        value={task.name}
-                        onChange={(e) => updateTaskName(index, e.target.value)}
-                        className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  These tasks will be created automatically based on your selected days
-                </p>
-              </div>
-            )}
 
             {/* Error Message */}
             {errors.submit && (
