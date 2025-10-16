@@ -219,8 +219,8 @@ class TaskControllerTest {
                         .param("startDate", startDate.toString())
                         .param("endDate", endDate.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].date").value("2025-10-20"));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[*].date", containsInAnyOrder("2025-10-20", "2025-10-22")));
     }
 
     @Test

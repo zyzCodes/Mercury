@@ -1,19 +1,35 @@
 "use client"
 
-import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import Image from "next/image"
+import { useEffect, useState, useMemo } from "react"
 import { useUser } from "@/hooks/useUser"
 import { getGoalsByUserId, type Goal } from "@/lib/goals-api"
+import { getHabitsByUserId } from "@/lib/habits-api"
+import { getTasksByDateRange, toggleTaskCompletion } from "@/lib/tasks-api"
+import { Habit, Task } from "@/types/habits"
+import Navbar from "@/components/Navbar"
 import GoalCard from "@/components/GoalCard"
+import WeeklyCalendar from "@/components/WeeklyCalendar"
+import HabitsList from "@/components/HabitsList"
 
 export default function DashboardPage() {
-  const { user, loading, error, session, isAuthenticated } = useUser()
+  const { user, loading, error, isAuthenticated } = useUser()
   const router = useRouter()
   const [goals, setGoals] = useState<Goal[]>([])
   const [goalsLoading, setGoalsLoading] = useState(true)
   const [goalsError, setGoalsError] = useState<string | null>(null)
+  const [habits, setHabits] = useState<Habit[]>([])
+  const [habitsLoading, setHabitsLoading] = useState(true)
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasksLoading, setTasksLoading] = useState(true)
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
+    const now = new Date()
+    const dayOfWeek = now.getDay()
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - dayOfWeek)
+    startOfWeek.setHours(0, 0, 0, 0)
+    return startOfWeek
+  })
 
   useEffect(() => {
     if (loading) return // Still loading
@@ -31,6 +47,87 @@ export default function DashboardPage() {
     }
   }, [user])
 
+  // Fetch user's habits
+  useEffect(() => {
+    if (user) {
+      setHabitsLoading(true)
+      getHabitsByUserId(user.id)
+        .then(setHabits)
+        .catch((err) => console.error('Failed to load habits:', err))
+        .finally(() => setHabitsLoading(false))
+    }
+  }, [user])
+
+  // Fetch current week's tasks
+  useEffect(() => {
+    if (user) {
+      setTasksLoading(true)
+      const endOfWeek = new Date(currentWeekStart)
+      endOfWeek.setDate(currentWeekStart.getDate() + 6)
+      endOfWeek.setHours(23, 59, 59, 999)
+
+      const startDateStr = currentWeekStart.toISOString().split('T')[0]
+      const endDateStr = endOfWeek.toISOString().split('T')[0]
+
+      getTasksByDateRange(user.id, startDateStr, endDateStr)
+        .then(setTasks)
+        .catch((err) => console.error('Failed to load tasks:', err))
+        .finally(() => setTasksLoading(false))
+    }
+  }, [user, currentWeekStart])
+
+  // Group tasks by date for the calendar
+  const tasksByDate = useMemo(() => {
+    const grouped: Record<string, Task[]> = {}
+    tasks.forEach(task => {
+      const dateKey = task.date
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = []
+      }
+      grouped[dateKey].push(task)
+    })
+    return grouped
+  }, [tasks])
+
+  // Handle task click/toggle
+  const handleTaskClick = async (task: Task) => {
+    try {
+      // Optimistically update the UI
+      setTasks(prevTasks =>
+        prevTasks.map(t =>
+          t.id === task.id ? { ...t, completed: !t.completed } : t
+        )
+      )
+
+      // Call API to toggle completion (this also updates the streak on backend)
+      await toggleTaskCompletion(task.id)
+
+      // Refetch habits to get updated streaks
+      if (user?.id) {
+        const updatedHabits = await getHabitsByUserId(user.id)
+        setHabits(updatedHabits)
+      }
+    } catch (err) {
+      console.error('Failed to toggle task:', err)
+      // Revert the optimistic update on error
+      setTasks(prevTasks =>
+        prevTasks.map(t =>
+          t.id === task.id ? { ...t, completed: task.completed } : t
+        )
+      )
+    }
+  }
+
+  // Handle habit click
+  const handleHabitClick = (habit: Habit) => {
+    router.push(`/goals/${habit.goalId}`)
+  }
+
+  // Handle week change
+  const handleWeekChange = (newWeekStart: Date) => {
+    setCurrentWeekStart(newWeekStart)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -45,26 +142,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">Mercury</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, {user?.name || user?.username || session?.user?.email}
-              </span>
-              <button
-                onClick={() => signOut({ callbackUrl: '/login' })}
-                className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="default" user={user || undefined} />
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
@@ -73,74 +151,46 @@ export default function DashboardPage() {
               Error loading user data: {error}
             </div>
           )}
-          
-          <div className="bg-white shadow rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Welcome to Mercury! 🚀
-            </h2>
-            
-            {user ? (
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  {user.avatarUrl && (
-                    <Image 
-                      src={user.avatarUrl} 
-                      alt="Profile" 
-                      width={80}
-                      height={80}
-                      className="w-20 h-20 rounded-full border-2 border-gray-200"
-                    />
-                  )}
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {user.name || user.username}
-                    </h3>
-                    <p className="text-gray-600">@{user.username}</p>
-                  </div>
+
+          {/* Weekly Tasks Calendar & Habits Section */}
+          <div className="mb-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Your Week</h2>
+              <p className="text-gray-600 text-sm mt-1">Track your daily tasks and build lasting habits</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Weekly Calendar - takes 3 columns on large screens */}
+            <div className="lg:col-span-3">
+              {tasksLoading ? (
+                <div className="bg-white rounded-xl shadow-md border border-gray-200 flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600 font-medium">Database ID</p>
-                    <p className="text-lg text-gray-900">{user.id}</p>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600 font-medium">Auth Provider</p>
-                    <p className="text-lg text-gray-900 capitalize">{user.provider}</p>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600 font-medium">Provider ID</p>
-                    <p className="text-lg text-gray-900">{user.providerId}</p>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600 font-medium">Email</p>
-                    <p className="text-lg text-gray-900">{user.email || 'Not provided'}</p>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600 font-medium">Member Since</p>
-                    <p className="text-lg text-gray-900">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  {user.location && (
-                    <div className="bg-gray-50 p-4 rounded">
-                      <p className="text-sm text-gray-600 font-medium">Location</p>
-                      <p className="text-lg text-gray-900">{user.location}</p>
-                    </div>
-                  )}
-                  {user.bio && (
-                    <div className="bg-gray-50 p-4 rounded md:col-span-2">
-                      <p className="text-sm text-gray-600 font-medium">Bio</p>
-                      <p className="text-lg text-gray-900">{user.bio}</p>
-                    </div>
-                  )}
+              ) : (
+                <WeeklyCalendar
+                  startDate={currentWeekStart}
+                  tasks={tasksByDate}
+                  onTaskClick={handleTaskClick}
+                  onDayClick={(date) => router.push(`/tasks?date=${date.toISOString().split('T')[0]}`)}
+                  onWeekChange={handleWeekChange}
+                />
+              )}
+            </div>
+
+            {/* Habits List - takes 1 column on large screens */}
+            <div className="lg:col-span-1">
+              {habitsLoading ? (
+                <div className="bg-white rounded-xl shadow-md border border-gray-200 flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 </div>
-              </div>
-            ) : (
-              <p className="text-gray-600">
-                You&apos;re successfully logged in and ready to start tracking your goals.
-              </p>
-            )}
+              ) : (
+                <HabitsList
+                  habits={habits}
+                  onHabitClick={handleHabitClick}
+                />
+              )}
+            </div>
+            </div>
           </div>
 
           {/* Goals Section */}
