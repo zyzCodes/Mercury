@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Run GoalsManager tests
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+GOALS_MANAGER="$PROJECT_ROOT/GoalsManager"
+
+cd "$GOALS_MANAGER"
+
+echo "🧪 Running GoalsManager tests..."
+echo ""
+
+./gradlew test
+
+echo ""
+echo "✅ All tests completed!"
+echo ""
+echo "Test reports available at:"
+echo "  file://$GOALS_MANAGER/build/reports/tests/test/index.html"

@@ -1,19 +1,18 @@
 package com.example.goalsmanager.dto;
 
-import com.example.goalsmanager.goalutils.GoalStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-public class CreateGoalRequest {
+public class CreateHabitRequest {
 
-    @NotBlank(message = "Title is required")
-    private String title;
+    @NotBlank(message = "Name is required")
+    private String name;
 
     private String description;
 
-    private String imageUrl;
+    private String daysOfWeek;
 
     @NotNull(message = "Start date is required")
     private LocalDate startDate;
@@ -21,31 +20,38 @@ public class CreateGoalRequest {
     @NotNull(message = "End date is required")
     private LocalDate endDate;
 
-    private GoalStatus status;
+    private String color;
+
+    @NotNull(message = "Goal ID is required")
+    private Long goalId;
 
     @NotNull(message = "User ID is required")
     private Long userId;
 
     // Constructors
-    public CreateGoalRequest() {
+    public CreateHabitRequest() {
     }
 
-    public CreateGoalRequest(String title, String description, LocalDate startDate,
-                             LocalDate endDate, Long userId) {
-        this.title = title;
+    public CreateHabitRequest(String name, String description, String daysOfWeek,
+                              LocalDate startDate, LocalDate endDate, String color,
+                              Long goalId, Long userId) {
+        this.name = name;
         this.description = description;
+        this.daysOfWeek = daysOfWeek;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.color = color;
+        this.goalId = goalId;
         this.userId = userId;
     }
 
     // Getters and Setters
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -56,12 +62,12 @@ public class CreateGoalRequest {
         this.description = description;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getDaysOfWeek() {
+        return daysOfWeek;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setDaysOfWeek(String daysOfWeek) {
+        this.daysOfWeek = daysOfWeek;
     }
 
     public LocalDate getStartDate() {
@@ -80,12 +86,20 @@ public class CreateGoalRequest {
         this.endDate = endDate;
     }
 
-    public GoalStatus getStatus() {
-        return status;
+    public String getColor() {
+        return color;
     }
 
-    public void setStatus(GoalStatus status) {
-        this.status = status;
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public Long getGoalId() {
+        return goalId;
+    }
+
+    public void setGoalId(Long goalId) {
+        this.goalId = goalId;
     }
 
     public Long getUserId() {

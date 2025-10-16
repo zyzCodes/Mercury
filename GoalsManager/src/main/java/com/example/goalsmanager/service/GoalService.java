@@ -48,7 +48,6 @@ public class GoalService {
         goal.setStartDate(request.getStartDate());
         goal.setEndDate(request.getEndDate());
         goal.setStatus(request.getStatus() != null ? request.getStatus() : GoalStatus.NOT_STARTED);
-        goal.setNotes(request.getNotes());
         goal.setUser(user);
 
         Goal savedGoal = goalRepository.save(goal);
@@ -139,9 +138,6 @@ public class GoalService {
         if (request.getStatus() != null) {
             goal.setStatus(request.getStatus());
         }
-        if (request.getNotes() != null) {
-            goal.setNotes(request.getNotes());
-        }
 
         // Validate dates if both are present
         if (goal.getStartDate() != null && goal.getEndDate() != null) {
@@ -160,18 +156,6 @@ public class GoalService {
                 .orElseThrow(() -> new RuntimeException("Goal not found with id: " + id));
         
         goal.setStatus(status);
-        Goal updatedGoal = goalRepository.save(goal);
-        return convertToDTO(updatedGoal);
-    }
-
-    /**
-     * Add or update notes for a goal
-     */
-    public GoalDTO updateGoalNotes(Long id, String notes) {
-        Goal goal = goalRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Goal not found with id: " + id));
-        
-        goal.setNotes(notes);
         Goal updatedGoal = goalRepository.save(goal);
         return convertToDTO(updatedGoal);
     }
@@ -273,7 +257,6 @@ public class GoalService {
                 goal.getStartDate(),
                 goal.getEndDate(),
                 goal.getStatus(),
-                goal.getNotes(),
                 goal.getUser().getId(),
                 goal.getUser().getUsername(),
                 goal.getCreatedAt(),

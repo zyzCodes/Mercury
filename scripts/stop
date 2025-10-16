@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Stop all Mercury Docker containers
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+cd "$PROJECT_ROOT"
+
+echo "🛑 Stopping Mercury containers..."
+docker-compose down
+
+echo ""
+echo "✅ All containers stopped!"
+echo ""
+echo "Note: Database volumes are preserved. Use './scripts/nuke_env' to start completely fresh."
+

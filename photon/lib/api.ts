@@ -2,7 +2,12 @@
  * API utility functions for communicating with the backend
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+// For server-side calls (inside Docker), use the container name
+// For client-side calls (browser), use localhost
+const isServer = typeof window === 'undefined';
+const SERVER_API_URL = process.env.API_URL || 'http://backend:8080/api';
+const CLIENT_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = isServer ? SERVER_API_URL : CLIENT_API_URL;
 
 export interface User {
   id: number;

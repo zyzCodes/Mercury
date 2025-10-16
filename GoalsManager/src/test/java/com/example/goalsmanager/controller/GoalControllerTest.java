@@ -205,7 +205,6 @@ class GoalControllerTest {
         UpdateGoalRequest updateRequest = new UpdateGoalRequest();
         updateRequest.setTitle("Learn Spring Boot Advanced");
         updateRequest.setStatus(GoalStatus.IN_PROGRESS);
-        updateRequest.setNotes("Making good progress!");
 
         // When & Then
         mockMvc.perform(put("/api/goals/{id}", testGoal.getId())
@@ -213,8 +212,7 @@ class GoalControllerTest {
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Learn Spring Boot Advanced"))
-                .andExpect(jsonPath("$.status").value("IN_PROGRESS"))
-                .andExpect(jsonPath("$.notes").value("Making good progress!"));
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
     }
 
     @Test
@@ -230,21 +228,6 @@ class GoalControllerTest {
                         .content(objectMapper.writeValueAsString(statusUpdate)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("COMPLETED"));
-    }
-
-    @Test
-    @DisplayName("PATCH /api/goals/{id}/notes - Should update goal notes")
-    void shouldUpdateGoalNotesTest() throws Exception {
-        // Given
-        Map<String, String> notesUpdate = new HashMap<>();
-        notesUpdate.put("notes", "Completed chapter 5. Great progress!");
-
-        // When & Then
-        mockMvc.perform(patch("/api/goals/{id}/notes", testGoal.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(notesUpdate)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.notes").value("Completed chapter 5. Great progress!"));
     }
 
     @Test
@@ -347,8 +330,8 @@ class GoalControllerTest {
     }
 
     @Test
-    @DisplayName("Should create goal with image URL and notes")
-    void shouldCreateGoalWithImageAndNotesTest() throws Exception {
+    @DisplayName("Should create goal with image URL")
+    void shouldCreateGoalWithImageUrlTest() throws Exception {
         // Given
         CreateGoalRequest request = new CreateGoalRequest();
         request.setTitle("Complete Marathon");
@@ -356,7 +339,6 @@ class GoalControllerTest {
         request.setImageUrl("https://example.com/marathon.jpg");
         request.setStartDate(LocalDate.of(2025, 1, 1));
         request.setEndDate(LocalDate.of(2025, 10, 31));
-        request.setNotes("Starting training next week");
         request.setUserId(testUser.getId());
 
         // When & Then
@@ -365,8 +347,7 @@ class GoalControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("Complete Marathon"))
-                .andExpect(jsonPath("$.imageUrl").value("https://example.com/marathon.jpg"))
-                .andExpect(jsonPath("$.notes").value("Starting training next week"));
+                .andExpect(jsonPath("$.imageUrl").value("https://example.com/marathon.jpg"));
     }
 
     @Test

@@ -1,39 +1,43 @@
 package com.example.goalsmanager.dto;
 
-import com.example.goalsmanager.goalutils.GoalStatus;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class GoalDTO {
+public class HabitDTO {
 
     private Long id;
-    private String title;
+    private String name;
     private String description;
-    private String imageUrl;
+    private String daysOfWeek;
     private LocalDate startDate;
     private LocalDate endDate;
-    private GoalStatus status;
+    private Integer streakStatus;
+    private String color;
+    private Long goalId;
+    private String goalTitle;
     private Long userId;
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     // Constructors
-    public GoalDTO() {
+    public HabitDTO() {
     }
 
-    public GoalDTO(Long id, String title, String description, String imageUrl,
-                   LocalDate startDate, LocalDate endDate, GoalStatus status,
-                   Long userId, String username,
-                   LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public HabitDTO(Long id, String name, String description, String daysOfWeek,
+                    LocalDate startDate, LocalDate endDate, Integer streakStatus, String color,
+                    Long goalId, String goalTitle, Long userId, String username,
+                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
-        this.title = title;
+        this.name = name;
         this.description = description;
-        this.imageUrl = imageUrl;
+        this.daysOfWeek = daysOfWeek;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.status = status;
+        this.streakStatus = streakStatus;
+        this.color = color;
+        this.goalId = goalId;
+        this.goalTitle = goalTitle;
         this.userId = userId;
         this.username = username;
         this.createdAt = createdAt;
@@ -49,12 +53,12 @@ public class GoalDTO {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -65,12 +69,12 @@ public class GoalDTO {
         this.description = description;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getDaysOfWeek() {
+        return daysOfWeek;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setDaysOfWeek(String daysOfWeek) {
+        this.daysOfWeek = daysOfWeek;
     }
 
     public LocalDate getStartDate() {
@@ -89,12 +93,36 @@ public class GoalDTO {
         this.endDate = endDate;
     }
 
-    public GoalStatus getStatus() {
-        return status;
+    public Integer getStreakStatus() {
+        return streakStatus;
     }
 
-    public void setStatus(GoalStatus status) {
-        this.status = status;
+    public void setStreakStatus(Integer streakStatus) {
+        this.streakStatus = streakStatus;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public Long getGoalId() {
+        return goalId;
+    }
+
+    public void setGoalId(Long goalId) {
+        this.goalId = goalId;
+    }
+
+    public String getGoalTitle() {
+        return goalTitle;
+    }
+
+    public void setGoalTitle(String goalTitle) {
+        this.goalTitle = goalTitle;
     }
 
     public Long getUserId() {

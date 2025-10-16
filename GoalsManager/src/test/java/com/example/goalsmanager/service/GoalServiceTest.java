@@ -212,7 +212,6 @@ class GoalServiceTest {
         UpdateGoalRequest updateRequest = new UpdateGoalRequest();
         updateRequest.setTitle("Learn Spring Boot Advanced");
         updateRequest.setStatus(GoalStatus.IN_PROGRESS);
-        updateRequest.setNotes("Making good progress");
 
         when(goalRepository.findById(1L)).thenReturn(Optional.of(testGoal));
         when(goalRepository.save(any(Goal.class))).thenReturn(testGoal);
@@ -226,7 +225,6 @@ class GoalServiceTest {
         verify(goalRepository, times(1)).save(testGoal);
         assertThat(testGoal.getTitle()).isEqualTo("Learn Spring Boot Advanced");
         assertThat(testGoal.getStatus()).isEqualTo(GoalStatus.IN_PROGRESS);
-        assertThat(testGoal.getNotes()).isEqualTo("Making good progress");
     }
 
     @Test
@@ -242,25 +240,6 @@ class GoalServiceTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(testGoal.getStatus()).isEqualTo(GoalStatus.COMPLETED);
-        
-        verify(goalRepository, times(1)).findById(1L);
-        verify(goalRepository, times(1)).save(testGoal);
-    }
-
-    @Test
-    @DisplayName("Should update goal notes successfully")
-    void shouldUpdateGoalNotesSuccessfully() {
-        // Given
-        String notes = "Completed chapter 5 today. Great progress!";
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(testGoal));
-        when(goalRepository.save(any(Goal.class))).thenReturn(testGoal);
-
-        // When
-        GoalDTO result = goalService.updateGoalNotes(1L, notes);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(testGoal.getNotes()).isEqualTo(notes);
         
         verify(goalRepository, times(1)).findById(1L);
         verify(goalRepository, times(1)).save(testGoal);

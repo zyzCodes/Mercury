@@ -65,6 +65,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Goal> goals = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Habit> habits = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
+
     // Constructors
     public User() {
     }
@@ -182,5 +188,43 @@ public class User {
     public void removeGoal(Goal goal) {
         goals.remove(goal);
         goal.setUser(null);
+    }
+
+    public List<Habit> getHabits() {
+        return habits;
+    }
+
+    public void setHabits(List<Habit> habits) {
+        this.habits = habits;
+    }
+
+    // Helper methods for bidirectional habit relationship
+    public void addHabit(Habit habit) {
+        habits.add(habit);
+        habit.setUser(this);
+    }
+
+    public void removeHabit(Habit habit) {
+        habits.remove(habit);
+        habit.setUser(null);
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    // Helper methods for bidirectional task relationship
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setUser(this);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setUser(null);
     }
 }

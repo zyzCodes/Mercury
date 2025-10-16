@@ -12,7 +12,6 @@ public class UpdateGoalRequest {
     private LocalDate startDate;
     private LocalDate endDate;
     private GoalStatus status;
-    private String notes;
 
     // Constructors
     public UpdateGoalRequest() {
@@ -65,14 +64,6 @@ public class UpdateGoalRequest {
 
     public void setStatus(GoalStatus status) {
         this.status = status;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
     }
 }
 

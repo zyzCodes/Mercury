@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Restart all or specific containers
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+cd "$PROJECT_ROOT"
+
+if [ -z "$1" ]; then
+    echo "🔄 Restarting all containers..."
+    docker-compose restart
+    echo "✅ All containers restarted!"
+else
+    echo "🔄 Restarting $1..."
+    docker-compose restart "$1"
+    echo "✅ Container $1 restarted!"
+fi
+
+echo ""
+echo "Services available at:"
+echo "  Frontend:  http://localhost:3000"
+echo "  Backend:   http://localhost:8080"
+echo "  Database:  localhost:5432"
+
