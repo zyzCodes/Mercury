@@ -1,6 +1,5 @@
 package com.example.goalsmanager.model;
 
-import com.example.goalsmanager.goalutils.GoalStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,22 +12,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "goals")
-public class Goal {
+@Table(name = "habits")
+public class Habit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank(message = "Title is required")
-    private String title;
+    @NotBlank(message = "Name is required")
+    private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "days_of_week")
+    private String daysOfWeek;
 
     @Column(name = "start_date", nullable = false)
     @NotNull(message = "Start date is required")
@@ -38,20 +37,24 @@ public class Goal {
     @NotNull(message = "End date is required")
     private LocalDate endDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private GoalStatus status = GoalStatus.NOT_STARTED;
+    @Column(name = "streak_status")
+    private Integer streakStatus = 0;
 
-    @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Note> notes = new ArrayList<>();
+    @Column(length = 7)
+    private String color;
 
-    @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Habit> habits = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id", nullable = false)
+    @NotNull(message = "Goal is required")
+    private Goal goal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @NotNull(message = "User is required")
     private User user;
+
+    @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -62,16 +65,20 @@ public class Goal {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public Goal() {
+    public Habit() {
     }
 
-    public Goal(String title, String description, LocalDate startDate, LocalDate endDate, User user) {
-        this.title = title;
+    public Habit(String name, String description, String daysOfWeek, 
+                 LocalDate startDate, LocalDate endDate, String color, Goal goal, User user) {
+        this.name = name;
         this.description = description;
+        this.daysOfWeek = daysOfWeek;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.color = color;
+        this.goal = goal;
         this.user = user;
-        this.status = GoalStatus.NOT_STARTED;
+        this.streakStatus = 0;
     }
 
     // Getters and Setters
@@ -83,12 +90,12 @@ public class Goal {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -99,12 +106,12 @@ public class Goal {
         this.description = description;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getDaysOfWeek() {
+        return daysOfWeek;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setDaysOfWeek(String daysOfWeek) {
+        this.daysOfWeek = daysOfWeek;
     }
 
     public LocalDate getStartDate() {
@@ -123,50 +130,28 @@ public class Goal {
         this.endDate = endDate;
     }
 
-    public GoalStatus getStatus() {
-        return status;
+    public Integer getStreakStatus() {
+        return streakStatus;
     }
 
-    public void setStatus(GoalStatus status) {
-        this.status = status;
+    public void setStreakStatus(Integer streakStatus) {
+        this.streakStatus = streakStatus;
     }
 
-    public List<Note> getNotes() {
-        return notes;
+    public String getColor() {
+        return color;
     }
 
-    public void setNotes(List<Note> notes) {
-        this.notes = notes;
+    public void setColor(String color) {
+        this.color = color;
     }
 
-    // Helper methods for bidirectional relationship
-    public void addNote(Note note) {
-        notes.add(note);
-        note.setGoal(this);
+    public Goal getGoal() {
+        return goal;
     }
 
-    public void removeNote(Note note) {
-        notes.remove(note);
-        note.setGoal(null);
-    }
-
-    public List<Habit> getHabits() {
-        return habits;
-    }
-
-    public void setHabits(List<Habit> habits) {
-        this.habits = habits;
-    }
-
-    // Helper methods for bidirectional habit relationship
-    public void addHabit(Habit habit) {
-        habits.add(habit);
-        habit.setGoal(this);
-    }
-
-    public void removeHabit(Habit habit) {
-        habits.remove(habit);
-        habit.setGoal(null);
+    public void setGoal(Goal goal) {
+        this.goal = goal;
     }
 
     public User getUser() {
@@ -175,6 +160,25 @@ public class Goal {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    // Helper methods for bidirectional relationship
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setHabit(this);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setHabit(null);
     }
 
     public LocalDateTime getCreatedAt() {
@@ -193,3 +197,4 @@ public class Goal {
         this.updatedAt = updatedAt;
     }
 }
+

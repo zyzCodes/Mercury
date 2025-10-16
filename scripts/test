@@ -19,4 +19,3 @@ echo "✅ All tests completed!"
 echo ""
 echo "Test reports available at:"
 echo "  file://$GOALS_MANAGER/build/reports/tests/test/index.html"
-

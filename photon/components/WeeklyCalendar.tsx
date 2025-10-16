@@ -1,6 +1,8 @@
 "use client"
 
 import { useMemo } from "react"
+import TaskCard from "./TaskCard"
+import { Task } from "@/types/habits"
 
 interface WeeklyCalendarProps {
   /**
@@ -12,9 +14,13 @@ interface WeeklyCalendarProps {
    */
   onDayClick?: (date: Date) => void
   /**
-   * Tasks grouped by day (for future implementation)
+   * Tasks grouped by day
    */
-  tasks?: Record<string, Array<{ id: string; title: string; color?: string }>>
+  tasks?: Record<string, Task[]>
+  /**
+   * Callback when a task is clicked
+   */
+  onTaskClick?: (task: Task) => void
 }
 
 interface DayInfo {
@@ -29,7 +35,8 @@ interface DayInfo {
 export default function WeeklyCalendar({ 
   startDate, 
   onDayClick,
-  tasks = {}
+  tasks = {},
+  onTaskClick
 }: WeeklyCalendarProps) {
   const weekDays = useMemo(() => {
     const days: DayInfo[] = []
@@ -96,12 +103,12 @@ export default function WeeklyCalendar({
 
       {/* Weekly Columnar View */}
       <div className="overflow-x-auto">
-        <div className="min-w-full inline-flex">
+        <div className="grid grid-cols-7 w-full min-w-[700px]">
           {weekDays.map((day, index) => (
             <div
               key={index}
               className={`
-                flex-1 min-w-[100px] xs:min-w-[120px] sm:min-w-[140px] border-r last:border-r-0
+                border-r last:border-r-0
                 ${day.isWeekend ? 'bg-gray-50' : 'bg-white'}
                 ${index === 0 ? '' : 'border-l border-gray-200'}
               `}
@@ -154,16 +161,13 @@ export default function WeeklyCalendar({
               <div className="p-2 min-h-[400px] space-y-2">
                 {getTasksForDay(day.date).length > 0 ? (
                   getTasksForDay(day.date).map((task) => (
-                    <div
+                    <TaskCard
                       key={task.id}
-                      className={`
-                        p-2 rounded-lg text-sm cursor-pointer
-                        transition-all hover:shadow-md
-                        ${task.color || 'bg-blue-100 text-blue-800 border border-blue-200'}
-                      `}
-                    >
-                      {task.title}
-                    </div>
+                      name={task.name}
+                      color={task.color}
+                      completed={task.completed}
+                      onClick={() => onTaskClick?.(task)}
+                    />
                   ))
                 ) : (
                   <div className="text-center text-gray-400 text-xs mt-4">
