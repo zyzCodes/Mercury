@@ -14,6 +14,7 @@ import {
 } from "@/lib/goals-api"
 import Navbar from "@/components/Navbar"
 import NotesList from "@/components/NotesList"
+import Footer from "@/components/Footer"
 import Image from "next/image"
 
 export default function GoalDetailPage() {
@@ -515,6 +516,8 @@ export default function GoalDetailPage() {
           </div>
         </div>
       )}
+
+      <Footer variant="subtle" />
     </div>
   )
 }

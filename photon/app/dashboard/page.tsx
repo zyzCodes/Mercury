@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar"
 import GoalCard from "@/components/GoalCard"
 import WeeklyCalendar from "@/components/WeeklyCalendar"
 import HabitsList from "@/components/HabitsList"
+import Footer from "@/components/Footer"
 
 export default function DashboardPage() {
   const { user, loading, error, isAuthenticated } = useUser()
@@ -248,6 +249,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      <Footer variant="subtle" />
     </div>
   )
 }

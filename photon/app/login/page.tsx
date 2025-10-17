@@ -3,6 +3,7 @@
 import { signIn, getSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Footer from "@/components/Footer"
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -148,6 +149,8 @@ export default function LoginPage() {
           </button>
         </p>
       </div>
+
+      <Footer variant="subtle" />
     </div>
   )
 }

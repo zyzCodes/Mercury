@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar"
 import WeeklyCalendar from "@/components/WeeklyCalendar"
 import HabitsList from "@/components/HabitsList"
 import CreateHabitModal from "@/components/CreateHabitModal"
+import Footer from "@/components/Footer"
 import { Habit, Task } from "@/types/habits"
 import { getHabitsByUserId } from "@/lib/habits-api"
 import { getTasksByDateRange, toggleTaskCompletion } from "@/lib/tasks-api"
@@ -284,6 +285,8 @@ export default function TasksPage() {
           onSuccess={handleCreateSuccess}
         />
       )}
+
+      <Footer variant="subtle" />
     </div>
   )
 }

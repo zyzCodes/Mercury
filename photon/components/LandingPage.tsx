@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import Footer from "./Footer"
 
 export default function LandingPage() {
   const router = useRouter()
@@ -184,25 +185,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
-        <div className="mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 text-center space-y-3">
-          <p className="text-gray-400">
-            © {new Date().getFullYear()} Mercury. Track your goals, build better habits.
-          </p>
-          <p className="text-gray-500 text-sm">
-            Built with ❤️ by{' '}
-            <a
-              href="https://diarana.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 font-semibold transition"
-            >
-              Diego Arana
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

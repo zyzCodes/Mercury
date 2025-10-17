@@ -7,6 +7,7 @@ import { createGoal, type CreateGoalRequest } from "@/lib/goals-api"
 import { createHabit } from "@/lib/habits-api"
 import { generateHabitRecommendations } from "@/lib/openai-api"
 import { AIHabitRecommendation } from "@/types/habits"
+import Footer from "@/components/Footer"
 import Image from "next/image"
 
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
@@ -698,6 +699,8 @@ export default function NewGoalPage() {
           animation: fadeIn 0.5s ease-out;
         }
       `}</style>
+
+      <Footer variant="subtle" />
     </div>
   )
 }
