@@ -16,8 +16,11 @@ Mercury is a full-stack goal-tracking web application that helps users create, m
 # Stop all services (preserves data)
 ./scripts/stop
 
-# Restart all services or specific service
+# Restart services (for config changes, no code rebuild)
 ./scripts/restart [backend|frontend|db]
+
+# Rebuild backend/frontend after CODE CHANGES (rebuilds and applies DB schema updates)
+./scripts/rebuild [backend|frontend|all]
 
 # View logs
 ./scripts/logs [backend|frontend|db]
@@ -25,6 +28,11 @@ Mercury is a full-stack goal-tracking web application that helps users create, m
 # Complete environment reset (WARNING: deletes all data)
 ./scripts/nuke_env
 ```
+
+**When to use each script:**
+- `./scripts/restart backend` - Quick restart for config/env changes (no rebuild)
+- `./scripts/rebuild backend` - After Java code changes, new entity fields, or DB schema modifications
+- `./scripts/rebuild frontend` - After adding npm packages or build config changes
 
 ### Backend (Spring Boot)
 ```bash
@@ -241,7 +249,7 @@ API_URL=http://backend:8080/api
 2. Add helper methods for bidirectional relationships
 3. Update DTOs to include new fields
 4. Update service layer to handle relationship management
-5. Restart backend (Hibernate will auto-update schema in dev)
+5. **Rebuild backend**: `./scripts/rebuild backend` (Hibernate will auto-update schema on container startup)
 
 ### Frontend Component Development
 1. Create API client functions in `/lib/*-api.ts` first
@@ -264,8 +272,10 @@ API_URL=http://backend:8080/api
 
 ### Working with Docker
 - Frontend has hot reload enabled (changes reflect immediately)
-- Backend requires restart for code changes: `./scripts/restart backend`
+- **Backend code changes**: Use `./scripts/rebuild backend` to rebuild and apply schema updates
+- **Quick restart** (config only): Use `./scripts/restart backend`
 - Database changes persist across restarts (stored in Docker volume)
+- **Important**: Always use `./scripts/rebuild backend` after modifying entity classes or adding fields
 
 ### Current Development Branch
 - Main branch: `main`

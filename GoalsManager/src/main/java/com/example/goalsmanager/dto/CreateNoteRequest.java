@@ -15,7 +15,7 @@ public class CreateNoteRequest {
     public CreateNoteRequest() {
     }
 
-    public CreateNoteRequest(String content, Long goalId) {
+    public CreateNoteRequest(final String content, final Long goalId) {
         this.content = content;
         this.goalId = goalId;
     }
@@ -25,7 +25,7 @@ public class CreateNoteRequest {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(final String content) {
         this.content = content;
     }
 
@@ -33,7 +33,7 @@ public class CreateNoteRequest {
         return goalId;
     }
 
-    public void setGoalId(Long goalId) {
+    public void setGoalId(final Long goalId) {
         this.goalId = goalId;
     }
 }

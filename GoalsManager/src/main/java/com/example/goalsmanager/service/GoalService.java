@@ -45,6 +45,7 @@ public class GoalService {
         goal.setTitle(request.getTitle());
         goal.setDescription(request.getDescription());
         goal.setImageUrl(request.getImageUrl());
+        goal.setEmoji(request.getEmoji());
         goal.setStartDate(request.getStartDate());
         goal.setEndDate(request.getEndDate());
         goal.setStatus(request.getStatus() != null ? request.getStatus() : GoalStatus.NOT_STARTED);
@@ -128,6 +129,9 @@ public class GoalService {
         }
         if (request.getImageUrl() != null) {
             goal.setImageUrl(request.getImageUrl());
+        }
+        if (request.getEmoji() != null) {
+            goal.setEmoji(request.getEmoji());
         }
         if (request.getStartDate() != null) {
             goal.setStartDate(request.getStartDate());
@@ -254,6 +258,7 @@ public class GoalService {
                 goal.getTitle(),
                 goal.getDescription(),
                 goal.getImageUrl(),
+                goal.getEmoji(),
                 goal.getStartDate(),
                 goal.getEndDate(),
                 goal.getStatus(),

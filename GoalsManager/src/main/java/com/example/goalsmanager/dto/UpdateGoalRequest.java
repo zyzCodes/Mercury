@@ -9,6 +9,7 @@ public class UpdateGoalRequest {
     private String title;
     private String description;
     private String imageUrl;
+    private String emoji;
     private LocalDate startDate;
     private LocalDate endDate;
     private GoalStatus status;
@@ -40,6 +41,14 @@ public class UpdateGoalRequest {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getEmoji() {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
     }
 
     public LocalDate getStartDate() {

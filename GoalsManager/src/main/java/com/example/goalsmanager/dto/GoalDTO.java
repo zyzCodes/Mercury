@@ -11,6 +11,7 @@ public class GoalDTO {
     private String title;
     private String description;
     private String imageUrl;
+    private String emoji;
     private LocalDate startDate;
     private LocalDate endDate;
     private GoalStatus status;
@@ -23,7 +24,7 @@ public class GoalDTO {
     public GoalDTO() {
     }
 
-    public GoalDTO(Long id, String title, String description, String imageUrl,
+    public GoalDTO(final Long id, final String title, final String description, final String imageUrl, final String emoji,
                    LocalDate startDate, LocalDate endDate, GoalStatus status,
                    Long userId, String username,
                    LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -31,6 +32,7 @@ public class GoalDTO {
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.emoji = emoji;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
@@ -71,6 +73,14 @@ public class GoalDTO {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getEmoji() {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
     }
 
     public LocalDate getStartDate() {
