@@ -28,7 +28,7 @@ export default function HabitsList({ habits, onHabitClick }: HabitsListProps) {
       </div>
 
       {/* Habits List */}
-      <div className="p-4 space-y-3 max-h-[400px] lg:max-h-[600px] overflow-y-auto">
+      <div className="p-4 space-y-3 max-h-[400px] lg:max-h-none overflow-y-auto">
         {habits.length === 0 ? (
           <div className="text-center text-gray-400 py-8 animate-fade-in">
             <svg 

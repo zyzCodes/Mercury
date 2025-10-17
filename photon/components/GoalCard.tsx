@@ -84,7 +84,7 @@ export default function GoalCard({ goal, onClick }: GoalCardProps) {
       ) : (
         // No image - use gradient background with emoji
         <div className="relative w-full h-48 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center">
-          <div className="text-6xl opacity-50">🎯</div>
+          <div className="text-6xl opacity-50">⚡️</div>
           
           {/* Status badge */}
           <div className="absolute top-3 right-3">

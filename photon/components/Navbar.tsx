@@ -30,6 +30,7 @@ export default function Navbar({
   const router = useRouter()
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" })
@@ -94,7 +95,7 @@ export default function Navbar({
   // Default variant for main pages (dashboard, tasks, etc.)
   return (
     <nav className="bg-white shadow sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-12 xl:px-16">
         <div className="flex justify-between h-16">
           {/* Left side - Logo and Nav Links */}
           <div className="flex items-center space-x-8">
@@ -133,30 +134,99 @@ export default function Navbar({
             )}
           </div>
 
-          {/* Right side - User info and Sign out (Desktop) */}
+          {/* Right side - Action buttons and Profile (Desktop) */}
           <div className="hidden md:flex items-center space-x-4">
-            {user && (
-              <div className="flex items-center space-x-3">
-                {user.avatarUrl && (
+            <button
+              onClick={() => handleNavigation('/tasks')}
+              className="bg-white text-blue-600 border-2 border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span className="text-sm font-medium">Weekly Tasks</span>
+            </button>
+            <button
+              onClick={() => handleNavigation('/new')}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="text-sm font-medium">New Goal</span>
+            </button>
+            {user && user.avatarUrl && (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-blue-500 transition overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
                   <Image
                     src={user.avatarUrl}
                     alt="Profile"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8 rounded-full border-2 border-gray-200"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
                   />
+                </button>
+
+                {/* Profile Dropdown Menu */}
+                {isProfileMenuOpen && (
+                  <>
+                    {/* Backdrop to close menu when clicking outside */}
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    />
+
+                    {/* Dropdown */}
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 z-20 overflow-hidden">
+                      {/* User Info Section */}
+                      <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-5">
+                        <div className="flex items-center space-x-3">
+                          <Image
+                            src={user.avatarUrl}
+                            alt="Profile"
+                            width={48}
+                            height={48}
+                            className="w-12 h-12 rounded-full border-2 border-white"
+                          />
+                          <div className="text-white">
+                            <p className="font-semibold text-sm">
+                              {user.name || user.username || 'User'}
+                            </p>
+                            {user.email && (
+                              <p className="text-xs text-blue-100 truncate">
+                                {user.email}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Encouraging Message */}
+                      <div className="px-4 py-4 bg-blue-50 border-b border-gray-100">
+                        <p className="text-sm text-gray-700 font-medium text-center">
+                          Keep crushing your goals! 🚀
+                        </p>
+                      </div>
+
+                      {/* Sign Out Button */}
+                      <div className="p-2">
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
-                <span className="text-sm text-gray-700">
-                  {user.name || user.username || user.email}
-                </span>
               </div>
             )}
-            <button
-              onClick={handleSignOut}
-              className="bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition"
-            >
-              Sign Out
-            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -203,7 +273,7 @@ export default function Navbar({
       {/* Mobile menu overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-gray-900/30 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -287,6 +357,28 @@ export default function Navbar({
                 Tasks
               </button>
             )}
+
+            {/* Action buttons in mobile menu */}
+            <div className="pt-4 border-t border-gray-200 space-y-2">
+              <button
+                onClick={() => handleNavigation("/tasks")}
+                className="w-full bg-white text-blue-600 border-2 border-blue-600 px-4 py-3 rounded-lg hover:bg-blue-50 transition flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span className="font-medium">Weekly Tasks</span>
+              </button>
+              <button
+                onClick={() => handleNavigation("/new")}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="font-medium">New Goal</span>
+              </button>
+            </div>
           </div>
 
           {/* Sign out button */}
