@@ -30,6 +30,7 @@ export default function Navbar({
   const router = useRouter()
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" })
@@ -133,7 +134,7 @@ export default function Navbar({
             )}
           </div>
 
-          {/* Right side - Action buttons, User info and Sign out (Desktop) */}
+          {/* Right side - Action buttons and Profile (Desktop) */}
           <div className="hidden md:flex items-center space-x-4">
             <button
               onClick={() => handleNavigation('/tasks')}
@@ -154,20 +155,78 @@ export default function Navbar({
               <span className="text-sm font-medium">New Goal</span>
             </button>
             {user && user.avatarUrl && (
-              <Image
-                src={user.avatarUrl}
-                alt="Profile"
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-full border-2 border-gray-200"
-              />
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-blue-500 transition overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  <Image
+                    src={user.avatarUrl}
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+
+                {/* Profile Dropdown Menu */}
+                {isProfileMenuOpen && (
+                  <>
+                    {/* Backdrop to close menu when clicking outside */}
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    />
+
+                    {/* Dropdown */}
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 z-20 overflow-hidden">
+                      {/* User Info Section */}
+                      <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-5">
+                        <div className="flex items-center space-x-3">
+                          <Image
+                            src={user.avatarUrl}
+                            alt="Profile"
+                            width={48}
+                            height={48}
+                            className="w-12 h-12 rounded-full border-2 border-white"
+                          />
+                          <div className="text-white">
+                            <p className="font-semibold text-sm">
+                              {user.name || user.username || 'User'}
+                            </p>
+                            {user.email && (
+                              <p className="text-xs text-blue-100 truncate">
+                                {user.email}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Encouraging Message */}
+                      <div className="px-4 py-4 bg-blue-50 border-b border-gray-100">
+                        <p className="text-sm text-gray-700 font-medium text-center">
+                          Keep crushing your goals! 🚀
+                        </p>
+                      </div>
+
+                      {/* Sign Out Button */}
+                      <div className="p-2">
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition font-medium"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
-            <button
-              onClick={handleSignOut}
-              className="bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition"
-            >
-              Sign Out
-            </button>
           </div>
 
           {/* Mobile menu button */}
