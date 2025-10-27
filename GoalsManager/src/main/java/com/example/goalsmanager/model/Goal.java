@@ -30,6 +30,9 @@ public class Goal {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "emoji")
+    private String emoji;
+
     @Column(name = "start_date", nullable = false)
     @NotNull(message = "Start date is required")
     private LocalDate startDate;
@@ -105,6 +108,14 @@ public class Goal {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getEmoji() {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
     }
 
     public LocalDate getStartDate() {

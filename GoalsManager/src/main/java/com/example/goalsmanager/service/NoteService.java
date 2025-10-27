@@ -22,7 +22,7 @@ public class NoteService {
     private final GoalRepository goalRepository;
 
     @Autowired
-    public NoteService(NoteRepository noteRepository, GoalRepository goalRepository) {
+    public NoteService(final NoteRepository noteRepository, final GoalRepository goalRepository) {
         this.noteRepository = noteRepository;
         this.goalRepository = goalRepository;
     }
@@ -30,17 +30,17 @@ public class NoteService {
     /**
      * Create a new note
      */
-    public NoteDTO createNote(CreateNoteRequest request) {
+    public NoteDTO createNote(final CreateNoteRequest request) {
         // Validate goal exists
-        Goal goal = goalRepository.findById(request.getGoalId())
+        final Goal goal = goalRepository.findById(request.getGoalId())
                 .orElseThrow(() -> new RuntimeException("Goal not found with id: " + request.getGoalId()));
 
         // Create note
-        Note note = new Note();
+        final Note note = new Note();
         note.setContent(request.getContent());
         note.setGoal(goal);
 
-        Note savedNote = noteRepository.save(note);
+        final Note savedNote = noteRepository.save(note);
         return convertToDTO(savedNote);
     }
 
@@ -48,8 +48,8 @@ public class NoteService {
      * Get note by ID
      */
     @Transactional(readOnly = true)
-    public NoteDTO getNoteById(Long id) {
-        Note note = noteRepository.findById(id)
+    public NoteDTO getNoteById(final Long id) {
+        final Note note = noteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Note not found with id: " + id));
         return convertToDTO(note);
     }
@@ -58,7 +58,7 @@ public class NoteService {
      * Get all notes for a specific goal, ordered by creation date descending
      */
     @Transactional(readOnly = true)
-    public List<NoteDTO> getNotesByGoalId(Long goalId) {
+    public List<NoteDTO> getNotesByGoalId(final Long goalId) {
         // Verify goal exists
         if (!goalRepository.existsById(goalId)) {
             throw new RuntimeException("Goal not found with id: " + goalId);
@@ -71,8 +71,8 @@ public class NoteService {
     /**
      * Update a note
      */
-    public NoteDTO updateNote(Long id, UpdateNoteRequest request) {
-        Note note = noteRepository.findById(id)
+    public NoteDTO updateNote(final Long id, final UpdateNoteRequest request) {
+        final Note note = noteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Note not found with id: " + id));
 
         // Update only if content is provided
@@ -80,14 +80,14 @@ public class NoteService {
             note.setContent(request.getContent());
         }
 
-        Note updatedNote = noteRepository.save(note);
+        final Note updatedNote = noteRepository.save(note);
         return convertToDTO(updatedNote);
     }
 
     /**
      * Delete a note
      */
-    public void deleteNote(Long id) {
+    public void deleteNote(final Long id) {
         if (!noteRepository.existsById(id)) {
             throw new RuntimeException("Note not found with id: " + id);
         }
@@ -97,7 +97,7 @@ public class NoteService {
     /**
      * Delete all notes for a specific goal
      */
-    public void deleteNotesByGoalId(Long goalId) {
+    public void deleteNotesByGoalId(final Long goalId) {
         noteRepository.deleteByGoalId(goalId);
     }
 
@@ -105,14 +105,14 @@ public class NoteService {
      * Count notes for a goal
      */
     @Transactional(readOnly = true)
-    public long countNotesByGoalId(Long goalId) {
+    public long countNotesByGoalId(final Long goalId) {
         return noteRepository.countByGoalId(goalId);
     }
 
     /**
      * Convert Note entity to NoteDTO
      */
-    private NoteDTO convertToDTO(Note note) {
+    private NoteDTO convertToDTO(final Note note) {
         return new NoteDTO(
                 note.getId(),
                 note.getContent(),

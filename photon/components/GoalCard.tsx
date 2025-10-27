@@ -84,8 +84,8 @@ export default function GoalCard({ goal, onClick }: GoalCardProps) {
       ) : (
         // No image - use gradient background with emoji
         <div className="relative w-full h-48 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center">
-          <div className="text-6xl opacity-50">⚡️</div>
-          
+          <div className="text-6xl opacity-50">{goal.emoji || '⚡️'}</div>
+
           {/* Status badge */}
           <div className="absolute top-3 right-3">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(goal.status)}`}>
@@ -98,8 +98,9 @@ export default function GoalCard({ goal, onClick }: GoalCardProps) {
       {/* Content Section */}
       <div className="p-5">
         {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-          {goal.title}
+        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors flex items-center gap-2">
+          {goal.emoji && <span className="text-2xl">{goal.emoji}</span>}
+          <span className="flex-1">{goal.title}</span>
         </h3>
 
         {/* Description */}

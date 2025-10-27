@@ -26,9 +26,9 @@ public class HabitService {
     private final UserRepository userRepository;
 
     @Autowired
-    public HabitService(HabitRepository habitRepository,
-                        GoalRepository goalRepository,
-                        UserRepository userRepository) {
+    public HabitService(final HabitRepository habitRepository,
+                        final GoalRepository goalRepository,
+                        final UserRepository userRepository) {
         this.habitRepository = habitRepository;
         this.goalRepository = goalRepository;
         this.userRepository = userRepository;
@@ -37,20 +37,20 @@ public class HabitService {
     /**
      * Create a new habit
      */
-    public HabitDTO createHabit(CreateHabitRequest request) {
+    public HabitDTO createHabit(final CreateHabitRequest request) {
         // Validate goal exists
-        Goal goal = goalRepository.findById(request.getGoalId())
+        final Goal goal = goalRepository.findById(request.getGoalId())
                 .orElseThrow(() -> new RuntimeException("Goal not found with id: " + request.getGoalId()));
 
         // Validate user exists
-        User user = userRepository.findById(request.getUserId())
+        final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
 
         // Validate dates
         validateDates(request.getStartDate(), request.getEndDate());
 
         // Create habit
-        Habit habit = new Habit();
+        final Habit habit = new Habit();
         habit.setName(request.getName());
         habit.setDescription(request.getDescription());
         habit.setDaysOfWeek(request.getDaysOfWeek());
@@ -61,7 +61,7 @@ public class HabitService {
         habit.setGoal(goal);
         habit.setUser(user);
 
-        Habit savedHabit = habitRepository.save(habit);
+        final Habit savedHabit = habitRepository.save(habit);
         return convertToDTO(savedHabit);
     }
 
@@ -69,8 +69,8 @@ public class HabitService {
      * Get habit by ID
      */
     @Transactional(readOnly = true)
-    public HabitDTO getHabitById(Long id) {
-        Habit habit = habitRepository.findById(id)
+    public HabitDTO getHabitById(final Long id) {
+        final Habit habit = habitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Habit not found with id: " + id));
         return convertToDTO(habit);
     }
@@ -89,7 +89,7 @@ public class HabitService {
      * Get all habits for a specific user
      */
     @Transactional(readOnly = true)
-    public List<HabitDTO> getHabitsByUserId(Long userId) {
+    public List<HabitDTO> getHabitsByUserId(final Long userId) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
@@ -103,7 +103,7 @@ public class HabitService {
      * Get all habits for a specific goal
      */
     @Transactional(readOnly = true)
-    public List<HabitDTO> getHabitsByGoalId(Long goalId) {
+    public List<HabitDTO> getHabitsByGoalId(final Long goalId) {
         // Verify goal exists
         if (!goalRepository.existsById(goalId)) {
             throw new RuntimeException("Goal not found with id: " + goalId);
@@ -116,8 +116,8 @@ public class HabitService {
     /**
      * Update habit
      */
-    public HabitDTO updateHabit(Long id, UpdateHabitRequest request) {
-        Habit habit = habitRepository.findById(id)
+    public HabitDTO updateHabit(final Long id, final UpdateHabitRequest request) {
+        final Habit habit = habitRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Habit not found with id: " + id));
 
         // Update only non-null fields
@@ -148,14 +148,14 @@ public class HabitService {
             validateDates(habit.getStartDate(), habit.getEndDate());
         }
 
-        Habit updatedHabit = habitRepository.save(habit);
+        final Habit updatedHabit = habitRepository.save(habit);
         return convertToDTO(updatedHabit);
     }
 
     /**
      * Delete habit
      */
-    public void deleteHabit(Long id) {
+    public void deleteHabit(final Long id) {
         if (!habitRepository.existsById(id)) {
             throw new RuntimeException("Habit not found with id: " + id);
         }
@@ -166,7 +166,7 @@ public class HabitService {
      * Check if a habit exists
      */
     @Transactional(readOnly = true)
-    public boolean existsById(Long id) {
+    public boolean existsById(final Long id) {
         return habitRepository.existsById(id);
     }
 
@@ -174,7 +174,7 @@ public class HabitService {
      * Count habits by user
      */
     @Transactional(readOnly = true)
-    public long countHabitsByUserId(Long userId) {
+    public long countHabitsByUserId(final Long userId) {
         return habitRepository.countByUserId(userId);
     }
 
@@ -182,14 +182,14 @@ public class HabitService {
      * Count habits by goal
      */
     @Transactional(readOnly = true)
-    public long countHabitsByGoalId(Long goalId) {
+    public long countHabitsByGoalId(final Long goalId) {
         return habitRepository.countByGoalId(goalId);
     }
 
     /**
      * Validate that end date is after start date
      */
-    private void validateDates(LocalDate startDate, LocalDate endDate) {
+    private void validateDates(final LocalDate startDate, final LocalDate endDate) {
         if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
             throw new RuntimeException("End date must be after start date");
         }
@@ -198,7 +198,7 @@ public class HabitService {
     /**
      * Convert Habit entity to HabitDTO
      */
-    private HabitDTO convertToDTO(Habit habit) {
+    private HabitDTO convertToDTO(final Habit habit) {
         return new HabitDTO(
                 habit.getId(),
                 habit.getName(),

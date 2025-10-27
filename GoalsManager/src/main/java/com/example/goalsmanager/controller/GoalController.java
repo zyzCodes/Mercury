@@ -22,7 +22,7 @@ public class GoalController {
     private final GoalService goalService;
 
     @Autowired
-    public GoalController(GoalService goalService) {
+    public GoalController(final GoalService goalService) {
         this.goalService = goalService;
     }
 
@@ -31,9 +31,9 @@ public class GoalController {
      * POST /api/goals
      */
     @PostMapping
-    public ResponseEntity<?> createGoal(@Valid @RequestBody CreateGoalRequest request) {
+    public ResponseEntity<?> createGoal(@Valid @RequestBody final CreateGoalRequest request) {
         try {
-            GoalDTO goal = goalService.createGoal(request);
+            final GoalDTO goal = goalService.createGoal(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(goal);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -47,7 +47,7 @@ public class GoalController {
      */
     @GetMapping
     public ResponseEntity<List<GoalDTO>> getAllGoals() {
-        List<GoalDTO> goals = goalService.getAllGoals();
+        final List<GoalDTO> goals = goalService.getAllGoals();
         return ResponseEntity.ok(goals);
     }
 
@@ -56,9 +56,9 @@ public class GoalController {
      * GET /api/goals/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getGoalById(@PathVariable Long id) {
+    public ResponseEntity<?> getGoalById(@PathVariable final Long id) {
         try {
-            GoalDTO goal = goalService.getGoalById(id);
+            final GoalDTO goal = goalService.getGoalById(id);
             return ResponseEntity.ok(goal);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -71,9 +71,9 @@ public class GoalController {
      * GET /api/goals/user/{userId}
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getGoalsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getGoalsByUserId(@PathVariable final Long userId) {
         try {
-            List<GoalDTO> goals = goalService.getGoalsByUserId(userId);
+            final List<GoalDTO> goals = goalService.getGoalsByUserId(userId);
             return ResponseEntity.ok(goals);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -87,10 +87,10 @@ public class GoalController {
      */
     @GetMapping("/user/{userId}/status/{status}")
     public ResponseEntity<?> getGoalsByUserIdAndStatus(
-            @PathVariable Long userId,
-            @PathVariable GoalStatus status) {
+            @PathVariable final Long userId,
+            @PathVariable final GoalStatus status) {
         try {
-            List<GoalDTO> goals = goalService.getGoalsByUserIdAndStatus(userId, status);
+            final List<GoalDTO> goals = goalService.getGoalsByUserIdAndStatus(userId, status);
             return ResponseEntity.ok(goals);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -103,8 +103,8 @@ public class GoalController {
      * GET /api/goals/status/{status}
      */
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<GoalDTO>> getGoalsByStatus(@PathVariable GoalStatus status) {
-        List<GoalDTO> goals = goalService.getGoalsByStatus(status);
+    public ResponseEntity<List<GoalDTO>> getGoalsByStatus(@PathVariable final GoalStatus status) {
+        final List<GoalDTO> goals = goalService.getGoalsByStatus(status);
         return ResponseEntity.ok(goals);
     }
 
@@ -113,9 +113,9 @@ public class GoalController {
      * GET /api/goals/user/{userId}/active
      */
     @GetMapping("/user/{userId}/active")
-    public ResponseEntity<?> getActiveGoalsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getActiveGoalsByUserId(@PathVariable final Long userId) {
         try {
-            List<GoalDTO> goals = goalService.getActiveGoalsByUserId(userId);
+            final List<GoalDTO> goals = goalService.getActiveGoalsByUserId(userId);
             return ResponseEntity.ok(goals);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -128,9 +128,9 @@ public class GoalController {
      * GET /api/goals/user/{userId}/completed
      */
     @GetMapping("/user/{userId}/completed")
-    public ResponseEntity<?> getCompletedGoalsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getCompletedGoalsByUserId(@PathVariable final Long userId) {
         try {
-            List<GoalDTO> goals = goalService.getCompletedGoalsByUserId(userId);
+            final List<GoalDTO> goals = goalService.getCompletedGoalsByUserId(userId);
             return ResponseEntity.ok(goals);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -143,9 +143,9 @@ public class GoalController {
      * GET /api/goals/user/{userId}/overdue
      */
     @GetMapping("/user/{userId}/overdue")
-    public ResponseEntity<?> getOverdueGoalsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getOverdueGoalsByUserId(@PathVariable final Long userId) {
         try {
-            List<GoalDTO> goals = goalService.getOverdueGoalsByUserId(userId);
+            final List<GoalDTO> goals = goalService.getOverdueGoalsByUserId(userId);
             return ResponseEntity.ok(goals);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -159,12 +159,12 @@ public class GoalController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateGoal(
-            @PathVariable Long id,
-            @RequestBody UpdateGoalRequest request) {
+            @PathVariable final Long id,
+            @RequestBody final UpdateGoalRequest request) {
         try {
-            GoalDTO goal = goalService.updateGoal(id, request);
+            final GoalDTO goal = goalService.updateGoal(id, request);
             return ResponseEntity.ok(goal);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -176,16 +176,16 @@ public class GoalController {
      */
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateGoalStatus(
-            @PathVariable Long id,
-            @RequestBody Map<String, String> request) {
+            @PathVariable final Long id,
+            @RequestBody final Map<String, String> request) {
         try {
-            GoalStatus status = GoalStatus.valueOf(request.get("status"));
-            GoalDTO goal = goalService.updateGoalStatus(id, status);
+            final GoalStatus status = GoalStatus.valueOf(request.get("status"));
+            final GoalDTO goal = goalService.updateGoalStatus(id, status);
             return ResponseEntity.ok(goal);
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(createErrorResponse("Invalid status value"));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -196,11 +196,11 @@ public class GoalController {
      * DELETE /api/goals/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteGoal(@PathVariable Long id) {
+    public ResponseEntity<?> deleteGoal(@PathVariable final Long id) {
         try {
             goalService.deleteGoal(id);
             return ResponseEntity.ok(createSuccessResponse("Goal deleted successfully"));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -211,9 +211,9 @@ public class GoalController {
      * GET /api/goals/exists/{id}
      */
     @GetMapping("/exists/{id}")
-    public ResponseEntity<Map<String, Boolean>> checkGoalExists(@PathVariable Long id) {
-        boolean exists = goalService.existsById(id);
-        Map<String, Boolean> response = new HashMap<>();
+    public ResponseEntity<Map<String, Boolean>> checkGoalExists(@PathVariable final Long id) {
+        final boolean exists = goalService.existsById(id);
+        final Map<String, Boolean> response = new HashMap<>();
         response.put("exists", exists);
         return ResponseEntity.ok(response);
     }
@@ -223,9 +223,9 @@ public class GoalController {
      * GET /api/goals/user/{userId}/count
      */
     @GetMapping("/user/{userId}/count")
-    public ResponseEntity<Map<String, Long>> countGoalsByUserId(@PathVariable Long userId) {
-        long count = goalService.countGoalsByUserId(userId);
-        Map<String, Long> response = new HashMap<>();
+    public ResponseEntity<Map<String, Long>> countGoalsByUserId(@PathVariable final Long userId) {
+        final long count = goalService.countGoalsByUserId(userId);
+        final Map<String, Long> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
     }
@@ -236,23 +236,23 @@ public class GoalController {
      */
     @GetMapping("/user/{userId}/count/{status}")
     public ResponseEntity<Map<String, Long>> countGoalsByUserIdAndStatus(
-            @PathVariable Long userId,
-            @PathVariable GoalStatus status) {
-        long count = goalService.countGoalsByUserIdAndStatus(userId, status);
-        Map<String, Long> response = new HashMap<>();
+            @PathVariable final Long userId,
+            @PathVariable final GoalStatus status) {
+        final long count = goalService.countGoalsByUserIdAndStatus(userId, status);
+        final Map<String, Long> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
     }
 
     // Helper methods for creating response objects
-    private Map<String, String> createErrorResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createErrorResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("error", message);
         return response;
     }
 
-    private Map<String, String> createSuccessResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createSuccessResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("message", message);
         return response;
     }

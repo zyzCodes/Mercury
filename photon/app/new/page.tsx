@@ -8,12 +8,14 @@ import { createHabit } from "@/lib/habits-api"
 import { generateHabitRecommendations } from "@/lib/openai-api"
 import { AIHabitRecommendation } from "@/types/habits"
 import Image from "next/image"
+import EmojiPicker from "@/components/EmojiPicker"
 
-type Step = 1 | 2 | 3 | 4 | 5 | 6;
+type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 interface GoalFormData {
   title: string;
   description: string;
+  emoji: string;
   imageUrl: string;
   startDate: string;
   endDate: string;
@@ -29,6 +31,7 @@ export default function NewGoalPage() {
   const [formData, setFormData] = useState<GoalFormData>({
     title: "",
     description: "",
+    emoji: "",
     imageUrl: "",
     startDate: "",
     endDate: "",
@@ -47,9 +50,9 @@ export default function NewGoalPage() {
     }
   }, [isAuthenticated, loading, router])
 
-  // Fetch AI recommendations when entering step 5
+  // Fetch AI recommendations when entering step 6
   useEffect(() => {
-    if (currentStep === 5 && !aiLoading && !aiSkipped && aiRecommendations.length === 0) {
+    if (currentStep === 6 && !aiLoading && !aiSkipped && aiRecommendations.length === 0) {
       fetchAiRecommendations()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,7 +66,7 @@ export default function NewGoalPage() {
     )
   }
 
-  const totalSteps = 6;
+  const totalSteps = 7;
   const progress = (currentStep / totalSteps) * 100;
 
   const fetchAiRecommendations = async () => {
@@ -115,12 +118,14 @@ export default function NewGoalPage() {
       case 2:
         return true // Description is optional
       case 3:
-        return true // Image is optional
+        return true // Emoji is optional
       case 4:
-        return formData.startDate && formData.endDate && formData.startDate <= formData.endDate
+        return true // Image is optional
       case 5:
-        return !aiLoading // Can proceed when AI is done loading (or if skipped/errored)
+        return formData.startDate && formData.endDate && formData.startDate <= formData.endDate
       case 6:
+        return !aiLoading // Can proceed when AI is done loading (or if skipped/errored)
+      case 7:
         return true // Review step
       default:
         return false
@@ -139,6 +144,7 @@ export default function NewGoalPage() {
         title: formData.title,
         description: formData.description || null,
         imageUrl: formData.imageUrl || null,
+        emoji: formData.emoji || null,
         startDate: formData.startDate,
         endDate: formData.endDate,
         userId: user.id,
@@ -283,8 +289,34 @@ export default function NewGoalPage() {
             </div>
           )}
 
-          {/* Step 3: Image */}
+          {/* Step 3: Emoji Icon */}
           {currentStep === 3 && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                  Pick an icon for your goal ✨
+                </h1>
+                <p className="text-lg text-gray-600">
+                  Choose an emoji to represent your goal
+                </p>
+              </div>
+
+              <EmojiPicker
+                value={formData.emoji}
+                onChange={(emoji) => setFormData({ ...formData, emoji })}
+                label="Select an emoji icon"
+              />
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  💡 <strong>Tip:</strong> This emoji will appear on your goal card to make it easy to identify at a glance.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Image */}
+          {currentStep === 4 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
@@ -329,8 +361,8 @@ export default function NewGoalPage() {
             </div>
           )}
 
-          {/* Step 4: Dates */}
-          {currentStep === 4 && (
+          {/* Step 5: Dates */}
+          {currentStep === 5 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
@@ -386,8 +418,8 @@ export default function NewGoalPage() {
             </div>
           )}
 
-          {/* Step 5: AI Habit Recommendations */}
-          {currentStep === 5 && (
+          {/* Step 6: AI Habit Recommendations */}
+          {currentStep === 6 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
@@ -525,8 +557,8 @@ export default function NewGoalPage() {
             </div>
           )}
 
-          {/* Step 6: Review & Submit */}
-          {currentStep === 6 && (
+          {/* Step 7: Review & Submit */}
+          {currentStep === 7 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
@@ -538,10 +570,13 @@ export default function NewGoalPage() {
               </div>
 
               <div className="space-y-6">
-                {/* Title */}
+                {/* Title with Emoji */}
                 <div className="bg-gray-50 rounded-xl p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Goal Title</h3>
-                  <p className="text-xl font-semibold text-gray-900">{formData.title}</p>
+                  <div className="flex items-center gap-3">
+                    {formData.emoji && <span className="text-3xl">{formData.emoji}</span>}
+                    <p className="text-xl font-semibold text-gray-900">{formData.title}</p>
+                  </div>
                 </div>
 
                 {/* Description */}
@@ -635,7 +670,7 @@ export default function NewGoalPage() {
             </button>
 
             <div className="flex gap-3">
-              {currentStep !== 1 && currentStep !== 4 && currentStep !== 5 && currentStep !== 6 && (
+              {currentStep !== 1 && currentStep !== 5 && currentStep !== 6 && currentStep !== 7 && (
                 <button
                   onClick={handleSkip}
                   className="px-6 py-3 text-gray-600 font-medium rounded-lg hover:bg-gray-100 transition"

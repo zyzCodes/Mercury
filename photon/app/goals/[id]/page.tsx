@@ -14,6 +14,7 @@ import {
 } from "@/lib/goals-api"
 import Navbar from "@/components/Navbar"
 import NotesList from "@/components/NotesList"
+import EmojiPicker from "@/components/EmojiPicker"
 import Image from "next/image"
 
 export default function GoalDetailPage() {
@@ -33,6 +34,7 @@ export default function GoalDetailPage() {
   const [editForm, setEditForm] = useState({
     title: "",
     description: "",
+    emoji: "",
     imageUrl: "",
     startDate: "",
     endDate: "",
@@ -59,6 +61,7 @@ export default function GoalDetailPage() {
           setEditForm({
             title: data.title,
             description: data.description || "",
+            emoji: data.emoji || "",
             imageUrl: data.imageUrl || "",
             startDate: data.startDate,
             endDate: data.endDate,
@@ -80,6 +83,7 @@ export default function GoalDetailPage() {
       const updateData: UpdateGoalRequest = {
         title: editForm.title,
         description: editForm.description || null,
+        emoji: editForm.emoji || null,
         imageUrl: editForm.imageUrl || null,
         startDate: editForm.startDate,
         endDate: editForm.endDate,
@@ -214,6 +218,7 @@ export default function GoalDetailPage() {
                   setEditForm({
                     title: goal.title,
                     description: goal.description || "",
+                    emoji: goal.emoji || "",
                     imageUrl: goal.imageUrl || "",
                     startDate: goal.startDate,
                     endDate: goal.endDate,
@@ -260,7 +265,7 @@ export default function GoalDetailPage() {
                 </div>
               ) : (
                 <div className="w-full h-80 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center">
-                  <div className="text-9xl opacity-50">🎯</div>
+                  <div className="text-9xl opacity-50">{(isEditing ? editForm.emoji : goal.emoji) || '🎯'}</div>
                 </div>
               )}
 
@@ -288,6 +293,13 @@ export default function GoalDetailPage() {
                       />
                     </div>
                     <div>
+                      <EmojiPicker
+                        value={editForm.emoji}
+                        onChange={(emoji) => setEditForm({ ...editForm, emoji })}
+                        label="Goal Icon"
+                      />
+                    </div>
+                    <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
                       <input
                         type="url"
@@ -300,7 +312,10 @@ export default function GoalDetailPage() {
                   </div>
                 ) : (
                   <>
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">{goal.title}</h1>
+                    <div className="flex items-center gap-3 mb-4">
+                      {goal.emoji && <span className="text-4xl">{goal.emoji}</span>}
+                      <h1 className="text-4xl font-bold text-gray-900">{goal.title}</h1>
+                    </div>
                     {goal.description && (
                       <p className="text-lg text-gray-700 leading-relaxed">{goal.description}</p>
                     )}

@@ -1,9 +1,65 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function LandingPage() {
   const router = useRouter()
+
+  // Sample goals for typewriter effect
+  const sampleGoals = [
+    { text: "Run a marathon", emoji: "🏃‍♀️" },
+    { text: "Get an A+ in Calculus", emoji: "💯" },
+    { text: "Get a summer internship", emoji: "🚀" },
+    { text: "Read 50 books this year", emoji: "📚" },
+    { text: "Learn a new language", emoji: "🌍" },
+    { text: "Build a startup", emoji: "💡" },
+    { text: "Master the guitar", emoji: "🎸" },
+    { text: "Travel to 10 countries", emoji: "✈️" },
+    { text: "Lose 20 pounds", emoji: "💪" },
+    { text: "Write a novel", emoji: "📖" }
+  ]
+
+  const [displayedText, setDisplayedText] = useState("")
+  const [showEmoji, setShowEmoji] = useState(false)
+  const [goalIndex, setGoalIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const currentGoal = sampleGoals[goalIndex].text
+    const typingSpeed = isDeleting ? 50 : 100
+    const pauseBeforeDelete = 2000
+    const pauseBeforeNext = 300
+
+    if (!isDeleting && displayedText === currentGoal) {
+      // Show emoji and pause before starting to delete
+      setShowEmoji(true)
+      const timeout = setTimeout(() => {
+        setShowEmoji(false) // Hide emoji first
+        setTimeout(() => setIsDeleting(true), 200) // Then start deleting text
+      }, pauseBeforeDelete)
+      return () => clearTimeout(timeout)
+    }
+
+    if (isDeleting && displayedText === "") {
+      // Move to next goal
+      setIsDeleting(false)
+      setGoalIndex((prevIndex) => (prevIndex + 1) % sampleGoals.length)
+      const timeout = setTimeout(() => {}, pauseBeforeNext)
+      return () => clearTimeout(timeout)
+    }
+
+    // Type or delete one character
+    const timeout = setTimeout(() => {
+      if (isDeleting) {
+        setDisplayedText(currentGoal.substring(0, displayedText.length - 1))
+      } else {
+        setDisplayedText(currentGoal.substring(0, displayedText.length + 1))
+      }
+    }, typingSpeed)
+
+    return () => clearTimeout(timeout)
+  }, [displayedText, goalIndex, isDeleting, sampleGoals])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -34,9 +90,24 @@ export default function LandingPage() {
               Build Better Habits
             </span>
           </h2>
-          <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
+          <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Mercury helps you set annual goals, build daily habits, and track your progress—all in one beautiful, intuitive platform.
           </p>
+
+          {/* Typewriter Sample Goals */}
+          <div className="min-h-[60px] mb-12 flex items-center justify-center">
+            <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                {displayedText}
+              </span>
+              {showEmoji && (
+                <span className="ml-2">
+                  {sampleGoals[goalIndex].emoji}
+                </span>
+              )}
+            </p>
+          </div>
+
           <button
             onClick={() => router.push('/login')}
             className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition shadow-xl hover:shadow-2xl transform hover:scale-105"

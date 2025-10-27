@@ -30,7 +30,7 @@ public class CreateUserRequest {
     public CreateUserRequest() {
     }
 
-    public CreateUserRequest(String provider, String providerId, String username, String email) {
+    public CreateUserRequest(final String provider, final String providerId, final String username, final String email) {
         this.provider = provider;
         this.providerId = providerId;
         this.username = username;
@@ -42,7 +42,7 @@ public class CreateUserRequest {
         return provider;
     }
 
-    public void setProvider(String provider) {
+    public void setProvider(final String provider) {
         this.provider = provider;
     }
 
@@ -50,7 +50,7 @@ public class CreateUserRequest {
         return providerId;
     }
 
-    public void setProviderId(String providerId) {
+    public void setProviderId(final String providerId) {
         this.providerId = providerId;
     }
 
@@ -58,7 +58,7 @@ public class CreateUserRequest {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -66,7 +66,7 @@ public class CreateUserRequest {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -74,7 +74,7 @@ public class CreateUserRequest {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -82,7 +82,7 @@ public class CreateUserRequest {
         return avatarUrl;
     }
 
-    public void setAvatarUrl(String avatarUrl) {
+    public void setAvatarUrl(final String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
 
@@ -90,7 +90,7 @@ public class CreateUserRequest {
         return bio;
     }
 
-    public void setBio(String bio) {
+    public void setBio(final String bio) {
         this.bio = bio;
     }
 
@@ -98,7 +98,7 @@ public class CreateUserRequest {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(final String location) {
         this.location = location;
     }
 }

@@ -23,7 +23,7 @@ public class CreateTaskRequest {
     public CreateTaskRequest() {
     }
 
-    public CreateTaskRequest(String name, LocalDate date, Long habitId, Long userId) {
+    public CreateTaskRequest(final String name, final LocalDate date, final Long habitId, final Long userId) {
         this.name = name;
         this.date = date;
         this.habitId = habitId;
@@ -35,7 +35,7 @@ public class CreateTaskRequest {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -43,7 +43,7 @@ public class CreateTaskRequest {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(final LocalDate date) {
         this.date = date;
     }
 
@@ -51,7 +51,7 @@ public class CreateTaskRequest {
         return habitId;
     }
 
-    public void setHabitId(Long habitId) {
+    public void setHabitId(final Long habitId) {
         this.habitId = habitId;
     }
 
@@ -59,7 +59,7 @@ public class CreateTaskRequest {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(final Long userId) {
         this.userId = userId;
     }
 }

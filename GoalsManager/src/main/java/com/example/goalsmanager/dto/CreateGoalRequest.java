@@ -15,6 +15,8 @@ public class CreateGoalRequest {
 
     private String imageUrl;
 
+    private String emoji;
+
     @NotNull(message = "Start date is required")
     private LocalDate startDate;
 
@@ -30,8 +32,8 @@ public class CreateGoalRequest {
     public CreateGoalRequest() {
     }
 
-    public CreateGoalRequest(String title, String description, LocalDate startDate,
-                             LocalDate endDate, Long userId) {
+    public CreateGoalRequest(final String title, final String description, final LocalDate startDate,
+                             final LocalDate endDate, final Long userId) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -62,6 +64,14 @@ public class CreateGoalRequest {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getEmoji() {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
     }
 
     public LocalDate getStartDate() {
