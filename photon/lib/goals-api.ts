@@ -16,6 +16,7 @@ export interface Goal {
   title: string;
   description: string | null;
   imageUrl: string | null;
+  emoji: string | null;
   startDate: string; // ISO date string
   endDate: string; // ISO date string
   status: GoalStatus;
@@ -29,6 +30,7 @@ export interface CreateGoalRequest {
   title: string;
   description?: string | null;
   imageUrl?: string | null;
+  emoji?: string | null;
   startDate: string; // ISO date string (YYYY-MM-DD)
   endDate: string; // ISO date string (YYYY-MM-DD)
   status?: GoalStatus;
@@ -39,6 +41,7 @@ export interface UpdateGoalRequest {
   title?: string;
   description?: string | null;
   imageUrl?: string | null;
+  emoji?: string | null;
   startDate?: string;
   endDate?: string;
   status?: GoalStatus;

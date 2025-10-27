@@ -18,7 +18,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(final UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -28,13 +28,13 @@ public class UserService {
      * Otherwise, create a new user
      */
     @Transactional
-    public UserDTO createOrUpdateUser(CreateUserRequest request) {
-        Optional<User> existingUser = userRepository.findByProviderAndProviderId(
-            request.getProvider(), 
+    public UserDTO createOrUpdateUser(final CreateUserRequest request) {
+        final Optional<User> existingUser = userRepository.findByProviderAndProviderId(
+            request.getProvider(),
             request.getProviderId()
         );
-        
-        User user;
+
+        final User user;
         if (existingUser.isPresent()) {
             // Update existing user
             user = existingUser.get();
@@ -46,15 +46,15 @@ public class UserService {
             user.setProviderId(request.getProviderId());
             updateUserFromRequest(user, request);
         }
-        
-        User savedUser = userRepository.save(user);
+
+        final User savedUser = userRepository.save(user);
         return new UserDTO(savedUser);
     }
 
     /**
      * Get a user by their provider and provider ID
      */
-    public Optional<UserDTO> getUserByProviderAndProviderId(String provider, String providerId) {
+    public Optional<UserDTO> getUserByProviderAndProviderId(final String provider, final String providerId) {
         return userRepository.findByProviderAndProviderId(provider, providerId)
                 .map(UserDTO::new);
     }
@@ -62,7 +62,7 @@ public class UserService {
     /**
      * Get a user by their ID
      */
-    public Optional<UserDTO> getUserById(Long id) {
+    public Optional<UserDTO> getUserById(final Long id) {
         return userRepository.findById(id)
                 .map(UserDTO::new);
     }
@@ -70,7 +70,7 @@ public class UserService {
     /**
      * Get a user by their username
      */
-    public Optional<UserDTO> getUserByUsername(String username) {
+    public Optional<UserDTO> getUserByUsername(final String username) {
         return userRepository.findByUsername(username)
                 .map(UserDTO::new);
     }
@@ -78,7 +78,7 @@ public class UserService {
     /**
      * Get a user by their email
      */
-    public Optional<UserDTO> getUserByEmail(String email) {
+    public Optional<UserDTO> getUserByEmail(final String email) {
         return userRepository.findByEmail(email)
                 .map(UserDTO::new);
     }
@@ -96,7 +96,7 @@ public class UserService {
      * Delete a user by their ID
      */
     @Transactional
-    public boolean deleteUser(Long id) {
+    public boolean deleteUser(final Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return true;
@@ -107,7 +107,7 @@ public class UserService {
     /**
      * Get all users by authentication provider
      */
-    public List<UserDTO> getUsersByProvider(String provider) {
+    public List<UserDTO> getUsersByProvider(final String provider) {
         return userRepository.findByProvider(provider).stream()
                 .map(UserDTO::new)
                 .collect(Collectors.toList());
@@ -116,14 +116,14 @@ public class UserService {
     /**
      * Check if a user exists by provider and provider ID
      */
-    public boolean existsByProviderAndProviderId(String provider, String providerId) {
+    public boolean existsByProviderAndProviderId(final String provider, final String providerId) {
         return userRepository.existsByProviderAndProviderId(provider, providerId);
     }
 
     /**
      * Helper method to update user fields from request
      */
-    private void updateUserFromRequest(User user, CreateUserRequest request) {
+    private void updateUserFromRequest(final User user, final CreateUserRequest request) {
         // TODO - don't update incoming data if request is sending NULL objects
         user.setUsername(request.getUsername());
         if (request.getEmail() != null) {

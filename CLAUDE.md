@@ -183,6 +183,7 @@ Each entity (User, Goal, Habit, Task, Note) follows this pattern:
 3. **Bidirectional relationships**: Use helper methods (`addGoal()`, `removeGoal()`) to maintain both sides
 4. **Consistent error handling**: Return appropriate HTTP status codes with meaningful messages
 5. **Transaction management**: Use `@Transactional` for operations that modify data
+6. **Use `final` modifiers liberally**: Apply `final` to classes, fields, method parameters, and local variables where appropriate (see Java Code Style section below)
 
 ### Frontend Patterns
 1. **API client functions**: All API calls are in `/lib/*-api.ts` files, never inline in components
@@ -196,6 +197,108 @@ Each entity (User, Goal, Habit, Task, Note) follows this pattern:
 2. **Service tests**: Use Mockito to mock repositories and dependencies
 3. **Controller tests**: Integration tests with `MockMvc` and `@WebMvcTest`
 4. **Test data**: Use H2 in-memory database for tests (configured in dependencies)
+
+### Java Code Style
+
+#### Use of `final` Modifier
+Apply the `final` modifier liberally throughout the Java codebase to improve code quality, clarity, and immutability. Follow these guidelines:
+
+**DO use `final` for:**
+1. **Classes** that are not designed to be extended:
+   - Utility classes
+   - Most DTO classes (when they don't need to be extended)
+   - **Note**: Do NOT use `final` on `@Configuration` classes - Spring needs to create CGLIB proxies
+
+2. **Fields** that should be immutable after construction:
+   - Constructor-injected dependencies in controllers and services
+   - Constants (use with `static final`)
+   - Any field that doesn't need to be reassigned
+
+3. **Method parameters** - Add `final` to ALL method parameters in:
+   - Controllers (e.g., `@PathVariable`, `@RequestBody`, `@RequestParam` parameters)
+   - Services (all public and private method parameters)
+   - Utility methods
+
+4. **Local variables** that are not reassigned:
+   - Variables initialized once and never modified
+   - Variables in try-catch blocks (catch parameters)
+   - Return value assignments that are returned immediately
+
+**DO NOT use `final` for:**
+1. **Spring `@Configuration` classes**:
+   - Spring needs to create CGLIB proxies for configuration classes
+   - Will cause runtime errors if marked `final`
+
+2. **JPA Entity classes** (User, Goal, Habit, Task, Note):
+   - Must remain non-final to allow JPA proxy generation
+   - Entity fields with setters should remain mutable for framework compatibility
+
+3. **Entity fields** that need setters:
+   - JPA entities require mutable fields for ORM operations
+   - Fields annotated with `@Column`, `@OneToMany`, `@ManyToOne`, etc.
+
+4. **Repository interfaces**:
+   - Keep interface method signatures clean
+   - Spring Data JPA generates implementations
+
+5. **DTO fields** (optional but recommended):
+   - DTO fields typically have setters for framework compatibility
+   - Constructor parameters in DTOs can remain non-final for simplicity
+
+**Example:**
+```java
+// Configuration class - NOT marked final (Spring needs to proxy it)
+@Configuration
+public class SecurityConfig {
+
+    // Method parameters marked final
+    @Bean
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
+        // Local variable marked final
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        return http.build();
+    }
+}
+
+// Controller with final injected dependency and parameters
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    // Injected dependency marked final
+    private final UserService userService;
+
+    public UserController(final UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDTO> createUser(@RequestBody final CreateUserRequest request) {
+        final UserDTO user = userService.createUser(request);
+        return ResponseEntity.ok(user);
+    }
+}
+
+// Entity class - NOT marked final
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;  // Not final - needs setter for JPA
+
+    private String email;  // Not final - needs setter for JPA
+
+    // Standard getters and setters...
+}
+```
+
+**Benefits:**
+- **Immutability**: Clear intent that values should not change
+- **Thread safety**: Helps reason about concurrent access
+- **Error prevention**: Prevents accidental reassignment bugs
+- **Code clarity**: Signals design intent to other developers
+- **Compiler optimization**: Enables potential optimizations
 
 ## Authentication Flow
 

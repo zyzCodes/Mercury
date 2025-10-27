@@ -28,9 +28,9 @@ public class TaskService {
     private final UserRepository userRepository;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository,
-                       HabitRepository habitRepository,
-                       UserRepository userRepository) {
+    public TaskService(final TaskRepository taskRepository,
+                       final HabitRepository habitRepository,
+                       final UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.habitRepository = habitRepository;
         this.userRepository = userRepository;
@@ -39,24 +39,24 @@ public class TaskService {
     /**
      * Create a new task
      */
-    public TaskDTO createTask(CreateTaskRequest request) {
+    public TaskDTO createTask(final CreateTaskRequest request) {
         // Validate habit exists
-        Habit habit = habitRepository.findById(request.getHabitId())
+        final Habit habit = habitRepository.findById(request.getHabitId())
                 .orElseThrow(() -> new RuntimeException("Habit not found with id: " + request.getHabitId()));
 
         // Validate user exists
-        User user = userRepository.findById(request.getUserId())
+        final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
 
         // Create task
-        Task task = new Task();
+        final Task task = new Task();
         task.setName(request.getName());
         task.setDate(request.getDate());
         task.setCompleted(false);
         task.setHabit(habit);
         task.setUser(user);
 
-        Task savedTask = taskRepository.save(task);
+        final Task savedTask = taskRepository.save(task);
         return convertToDTO(savedTask);
     }
 
@@ -64,8 +64,8 @@ public class TaskService {
      * Get task by ID
      */
     @Transactional(readOnly = true)
-    public TaskDTO getTaskById(Long id) {
-        Task task = taskRepository.findById(id)
+    public TaskDTO getTaskById(final Long id) {
+        final Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
         return convertToDTO(task);
     }
@@ -84,7 +84,7 @@ public class TaskService {
      * Get all tasks for a specific user
      */
     @Transactional(readOnly = true)
-    public List<TaskDTO> getTasksByUserId(Long userId) {
+    public List<TaskDTO> getTasksByUserId(final Long userId) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
@@ -98,7 +98,7 @@ public class TaskService {
      * Get all tasks for a specific habit
      */
     @Transactional(readOnly = true)
-    public List<TaskDTO> getTasksByHabitId(Long habitId) {
+    public List<TaskDTO> getTasksByHabitId(final Long habitId) {
         // Verify habit exists
         if (!habitRepository.existsById(habitId)) {
             throw new RuntimeException("Habit not found with id: " + habitId);
@@ -112,7 +112,7 @@ public class TaskService {
      * Get tasks by user ID and date range
      * Automatically generates missing tasks for the user's active habits
      */
-    public List<TaskDTO> getTasksByUserIdAndDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
+    public List<TaskDTO> getTasksByUserIdAndDateRange(final Long userId, final LocalDate startDate, final LocalDate endDate) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
@@ -131,11 +131,11 @@ public class TaskService {
      * Generate missing tasks for all habits of a user within a date range
      * This method is idempotent - it only creates tasks that don't already exist
      */
-    private void generateMissingTasksForUser(Long userId, LocalDate startDate, LocalDate endDate) {
+    private void generateMissingTasksForUser(final Long userId, final LocalDate startDate, final LocalDate endDate) {
         // Get all habits for the user
-        List<Habit> userHabits = habitRepository.findByUserId(userId);
+        final List<Habit> userHabits = habitRepository.findByUserId(userId);
 
-        for (Habit habit : userHabits) {
+        for (final Habit habit : userHabits) {
             generateTasksForHabit(habit, startDate, endDate);
         }
     }
@@ -144,10 +144,10 @@ public class TaskService {
      * Generate tasks for a specific habit within a date range
      * Only generates tasks for dates that match the habit's daysOfWeek pattern
      */
-    private void generateTasksForHabit(Habit habit, LocalDate rangeStart, LocalDate rangeEnd) {
+    private void generateTasksForHabit(final Habit habit, final LocalDate rangeStart, final LocalDate rangeEnd) {
         // Parse the habit's days of week (e.g., "Mon, Wed, Fri")
-        String[] selectedDays = habit.getDaysOfWeek().split(",\\s*");
-        List<DayOfWeek> habitDays = parseDaysOfWeek(selectedDays);
+        final String[] selectedDays = habit.getDaysOfWeek().split(",\\s*");
+        final List<DayOfWeek> habitDays = parseDaysOfWeek(selectedDays);
 
         if (habitDays.isEmpty()) {
             return; // No days selected, nothing to generate
@@ -155,26 +155,26 @@ public class TaskService {
 
         // Determine the actual start and end dates for task generation
         // Tasks should only be generated within the habit's active period
-        LocalDate effectiveStart = rangeStart.isBefore(habit.getStartDate()) ? habit.getStartDate() : rangeStart;
-        LocalDate effectiveEnd = rangeEnd.isAfter(habit.getEndDate()) ? habit.getEndDate() : rangeEnd;
+        final LocalDate effectiveStart = rangeStart.isBefore(habit.getStartDate()) ? habit.getStartDate() : rangeStart;
+        final LocalDate effectiveEnd = rangeEnd.isAfter(habit.getEndDate()) ? habit.getEndDate() : rangeEnd;
 
         if (effectiveStart.isAfter(effectiveEnd)) {
             return; // No overlap between range and habit period
         }
 
         // Generate tasks for each matching day
-        List<Task> tasksToCreate = new ArrayList<>();
+        final List<Task> tasksToCreate = new ArrayList<>();
         LocalDate currentDate = effectiveStart;
 
         while (!currentDate.isAfter(effectiveEnd)) {
             // Check if this day matches the habit's schedule
             if (habitDays.contains(currentDate.getDayOfWeek())) {
                 // Check if task already exists for this date
-                boolean taskExists = taskRepository.existsByHabitIdAndDate(habit.getId(), currentDate);
+                final boolean taskExists = taskRepository.existsByHabitIdAndDate(habit.getId(), currentDate);
 
                 if (!taskExists) {
                     // Create new task
-                    Task task = new Task();
+                    final Task task = new Task();
                     task.setName(habit.getName());
                     task.setDate(currentDate);
                     task.setCompleted(false);
@@ -195,9 +195,9 @@ public class TaskService {
     /**
      * Parse day of week strings (Mon, Tue, etc.) into DayOfWeek enum values
      */
-    private List<DayOfWeek> parseDaysOfWeek(String[] dayStrings) {
-        List<DayOfWeek> days = new ArrayList<>();
-        for (String dayStr : dayStrings) {
+    private List<DayOfWeek> parseDaysOfWeek(final String[] dayStrings) {
+        final List<DayOfWeek> days = new ArrayList<>();
+        for (final String dayStr : dayStrings) {
             switch (dayStr.trim()) {
                 case "Mon": days.add(DayOfWeek.MONDAY); break;
                 case "Tue": days.add(DayOfWeek.TUESDAY); break;
@@ -215,7 +215,7 @@ public class TaskService {
      * Get completed tasks for a user
      */
     @Transactional(readOnly = true)
-    public List<TaskDTO> getCompletedTasksByUserId(Long userId) {
+    public List<TaskDTO> getCompletedTasksByUserId(final Long userId) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
@@ -229,7 +229,7 @@ public class TaskService {
      * Get pending tasks for a user
      */
     @Transactional(readOnly = true)
-    public List<TaskDTO> getPendingTasksByUserId(Long userId) {
+    public List<TaskDTO> getPendingTasksByUserId(final Long userId) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
@@ -242,8 +242,8 @@ public class TaskService {
     /**
      * Update task
      */
-    public TaskDTO updateTask(Long id, UpdateTaskRequest request) {
-        Task task = taskRepository.findById(id)
+    public TaskDTO updateTask(final Long id, final UpdateTaskRequest request) {
+        final Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
 
         // Update only non-null fields
@@ -257,58 +257,58 @@ public class TaskService {
             task.setDate(request.getDate());
         }
 
-        Task updatedTask = taskRepository.save(task);
+        final Task updatedTask = taskRepository.save(task);
         return convertToDTO(updatedTask);
     }
 
     /**
      * Toggle task completion status and update habit streak
      */
-    public TaskDTO toggleTaskCompletion(Long id) {
-        Task task = taskRepository.findById(id)
+    public TaskDTO toggleTaskCompletion(final Long id) {
+        final Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
 
         task.setCompleted(!task.getCompleted());
-        Task updatedTask = taskRepository.save(task);
-        
+        final Task updatedTask = taskRepository.save(task);
+
         // Update habit streak after toggling task
         updateHabitStreak(task.getHabit());
-        
+
         return convertToDTO(updatedTask);
     }
-    
+
     /**
      * Calculate and update habit streak based on completed tasks
      * Only looks at actual scheduled tasks, not arbitrary days
      */
-    private void updateHabitStreak(Habit habit) {
-        LocalDate today = LocalDate.now();
-        
+    private void updateHabitStreak(final Habit habit) {
+        final LocalDate today = LocalDate.now();
+
         // Get all past tasks (from start date to today) ordered by date descending (newest first)
-        List<Task> pastTasks = taskRepository.findByHabitIdAndDateLessThanEqualOrderByDateDesc(
+        final List<Task> pastTasks = taskRepository.findByHabitIdAndDateLessThanEqualOrderByDateDesc(
             habit.getId(), today
         );
-        
+
         if (pastTasks.isEmpty()) {
             habit.setStreakStatus(0);
             habitRepository.save(habit);
             return;
         }
-        
+
         // Check the most recent task
-        Task mostRecentTask = pastTasks.get(0);
-        
+        final Task mostRecentTask = pastTasks.get(0);
+
         // If the last task was not completed, streak is 0
         if (!mostRecentTask.getCompleted()) {
             habit.setStreakStatus(0);
             habitRepository.save(habit);
             return;
         }
-        
+
         // Count backwards from the most recent task
         // Keep counting as long as tasks are completed
         int streak = 0;
-        for (Task task : pastTasks) {
+        for (final Task task : pastTasks) {
             if (task.getCompleted()) {
                 streak++;
             } else {
@@ -316,7 +316,7 @@ public class TaskService {
                 break;
             }
         }
-        
+
         habit.setStreakStatus(streak);
         habitRepository.save(habit);
     }
@@ -324,7 +324,7 @@ public class TaskService {
     /**
      * Delete task
      */
-    public void deleteTask(Long id) {
+    public void deleteTask(final Long id) {
         if (!taskRepository.existsById(id)) {
             throw new RuntimeException("Task not found with id: " + id);
         }
@@ -335,7 +335,7 @@ public class TaskService {
      * Check if a task exists
      */
     @Transactional(readOnly = true)
-    public boolean existsById(Long id) {
+    public boolean existsById(final Long id) {
         return taskRepository.existsById(id);
     }
 
@@ -343,7 +343,7 @@ public class TaskService {
      * Count tasks by user
      */
     @Transactional(readOnly = true)
-    public long countTasksByUserId(Long userId) {
+    public long countTasksByUserId(final Long userId) {
         return taskRepository.countByUserId(userId);
     }
 
@@ -351,14 +351,14 @@ public class TaskService {
      * Count tasks by habit
      */
     @Transactional(readOnly = true)
-    public long countTasksByHabitId(Long habitId) {
+    public long countTasksByHabitId(final Long habitId) {
         return taskRepository.countByHabitId(habitId);
     }
 
     /**
      * Convert Task entity to TaskDTO
      */
-    private TaskDTO convertToDTO(Task task) {
+    private TaskDTO convertToDTO(final Task task) {
         return new TaskDTO(
                 task.getId(),
                 task.getName(),

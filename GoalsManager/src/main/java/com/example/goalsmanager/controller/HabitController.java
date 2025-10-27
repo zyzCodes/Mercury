@@ -21,7 +21,7 @@ public class HabitController {
     private final HabitService habitService;
 
     @Autowired
-    public HabitController(HabitService habitService) {
+    public HabitController(final HabitService habitService) {
         this.habitService = habitService;
     }
 
@@ -30,11 +30,11 @@ public class HabitController {
      * POST /api/habits
      */
     @PostMapping
-    public ResponseEntity<?> createHabit(@Valid @RequestBody CreateHabitRequest request) {
+    public ResponseEntity<?> createHabit(@Valid @RequestBody final CreateHabitRequest request) {
         try {
-            HabitDTO habit = habitService.createHabit(request);
+            final HabitDTO habit = habitService.createHabit(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(habit);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -46,7 +46,7 @@ public class HabitController {
      */
     @GetMapping
     public ResponseEntity<List<HabitDTO>> getAllHabits() {
-        List<HabitDTO> habits = habitService.getAllHabits();
+        final List<HabitDTO> habits = habitService.getAllHabits();
         return ResponseEntity.ok(habits);
     }
 
@@ -55,11 +55,11 @@ public class HabitController {
      * GET /api/habits/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getHabitById(@PathVariable Long id) {
+    public ResponseEntity<?> getHabitById(@PathVariable final Long id) {
         try {
-            HabitDTO habit = habitService.getHabitById(id);
+            final HabitDTO habit = habitService.getHabitById(id);
             return ResponseEntity.ok(habit);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -70,11 +70,11 @@ public class HabitController {
      * GET /api/habits/user/{userId}
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getHabitsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getHabitsByUserId(@PathVariable final Long userId) {
         try {
-            List<HabitDTO> habits = habitService.getHabitsByUserId(userId);
+            final List<HabitDTO> habits = habitService.getHabitsByUserId(userId);
             return ResponseEntity.ok(habits);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -85,9 +85,9 @@ public class HabitController {
      * GET /api/habits/goal/{goalId}
      */
     @GetMapping("/goal/{goalId}")
-    public ResponseEntity<?> getHabitsByGoalId(@PathVariable Long goalId) {
+    public ResponseEntity<?> getHabitsByGoalId(@PathVariable final Long goalId) {
         try {
-            List<HabitDTO> habits = habitService.getHabitsByGoalId(goalId);
+            final List<HabitDTO> habits = habitService.getHabitsByGoalId(goalId);
             return ResponseEntity.ok(habits);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -101,12 +101,12 @@ public class HabitController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateHabit(
-            @PathVariable Long id,
-            @RequestBody UpdateHabitRequest request) {
+            @PathVariable final Long id,
+            @RequestBody final UpdateHabitRequest request) {
         try {
-            HabitDTO habit = habitService.updateHabit(id, request);
+            final HabitDTO habit = habitService.updateHabit(id, request);
             return ResponseEntity.ok(habit);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -117,11 +117,11 @@ public class HabitController {
      * DELETE /api/habits/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteHabit(@PathVariable Long id) {
+    public ResponseEntity<?> deleteHabit(@PathVariable final Long id) {
         try {
             habitService.deleteHabit(id);
             return ResponseEntity.ok(createSuccessResponse("Habit deleted successfully"));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -132,9 +132,9 @@ public class HabitController {
      * GET /api/habits/exists/{id}
      */
     @GetMapping("/exists/{id}")
-    public ResponseEntity<Map<String, Boolean>> checkHabitExists(@PathVariable Long id) {
-        boolean exists = habitService.existsById(id);
-        Map<String, Boolean> response = new HashMap<>();
+    public ResponseEntity<Map<String, Boolean>> checkHabitExists(@PathVariable final Long id) {
+        final boolean exists = habitService.existsById(id);
+        final Map<String, Boolean> response = new HashMap<>();
         response.put("exists", exists);
         return ResponseEntity.ok(response);
     }
@@ -144,9 +144,9 @@ public class HabitController {
      * GET /api/habits/user/{userId}/count
      */
     @GetMapping("/user/{userId}/count")
-    public ResponseEntity<Map<String, Long>> countHabitsByUserId(@PathVariable Long userId) {
-        long count = habitService.countHabitsByUserId(userId);
-        Map<String, Long> response = new HashMap<>();
+    public ResponseEntity<Map<String, Long>> countHabitsByUserId(@PathVariable final Long userId) {
+        final long count = habitService.countHabitsByUserId(userId);
+        final Map<String, Long> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
     }
@@ -156,22 +156,22 @@ public class HabitController {
      * GET /api/habits/goal/{goalId}/count
      */
     @GetMapping("/goal/{goalId}/count")
-    public ResponseEntity<Map<String, Long>> countHabitsByGoalId(@PathVariable Long goalId) {
-        long count = habitService.countHabitsByGoalId(goalId);
-        Map<String, Long> response = new HashMap<>();
+    public ResponseEntity<Map<String, Long>> countHabitsByGoalId(@PathVariable final Long goalId) {
+        final long count = habitService.countHabitsByGoalId(goalId);
+        final Map<String, Long> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
     }
 
     // Helper methods for creating response objects
-    private Map<String, String> createErrorResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createErrorResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("error", message);
         return response;
     }
 
-    private Map<String, String> createSuccessResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createSuccessResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("message", message);
         return response;
     }

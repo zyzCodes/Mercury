@@ -24,7 +24,7 @@ public class GoalService {
     private final UserRepository userRepository;
 
     @Autowired
-    public GoalService(GoalRepository goalRepository, UserRepository userRepository) {
+    public GoalService(final GoalRepository goalRepository, final UserRepository userRepository) {
         this.goalRepository = goalRepository;
         this.userRepository = userRepository;
     }
@@ -32,16 +32,16 @@ public class GoalService {
     /**
      * Create a new goal
      */
-    public GoalDTO createGoal(CreateGoalRequest request) {
+    public GoalDTO createGoal(final CreateGoalRequest request) {
         // Validate user exists
-        User user = userRepository.findById(request.getUserId())
+        final User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
 
         // Validate dates
         validateDates(request.getStartDate(), request.getEndDate());
 
         // Create goal
-        Goal goal = new Goal();
+        final Goal goal = new Goal();
         goal.setTitle(request.getTitle());
         goal.setDescription(request.getDescription());
         goal.setImageUrl(request.getImageUrl());
@@ -51,7 +51,7 @@ public class GoalService {
         goal.setStatus(request.getStatus() != null ? request.getStatus() : GoalStatus.NOT_STARTED);
         goal.setUser(user);
 
-        Goal savedGoal = goalRepository.save(goal);
+        final Goal savedGoal = goalRepository.save(goal);
         return convertToDTO(savedGoal);
     }
 
@@ -59,8 +59,8 @@ public class GoalService {
      * Get goal by ID
      */
     @Transactional(readOnly = true)
-    public GoalDTO getGoalById(Long id) {
-        Goal goal = goalRepository.findById(id)
+    public GoalDTO getGoalById(final Long id) {
+        final Goal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found with id: " + id));
         return convertToDTO(goal);
     }
@@ -79,7 +79,7 @@ public class GoalService {
      * Get all goals for a specific user
      */
     @Transactional(readOnly = true)
-    public List<GoalDTO> getGoalsByUserId(Long userId) {
+    public List<GoalDTO> getGoalsByUserId(final Long userId) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
@@ -93,7 +93,7 @@ public class GoalService {
      * Get goals by user ID and status
      */
     @Transactional(readOnly = true)
-    public List<GoalDTO> getGoalsByUserIdAndStatus(Long userId, GoalStatus status) {
+    public List<GoalDTO> getGoalsByUserIdAndStatus(final Long userId, final GoalStatus status) {
         // Verify user exists
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found with id: " + userId);
@@ -107,7 +107,7 @@ public class GoalService {
      * Get goals by status
      */
     @Transactional(readOnly = true)
-    public List<GoalDTO> getGoalsByStatus(GoalStatus status) {
+    public List<GoalDTO> getGoalsByStatus(final GoalStatus status) {
         return goalRepository.findByStatus(status).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -116,8 +116,8 @@ public class GoalService {
     /**
      * Update goal
      */
-    public GoalDTO updateGoal(Long id, UpdateGoalRequest request) {
-        Goal goal = goalRepository.findById(id)
+    public GoalDTO updateGoal(final Long id, final UpdateGoalRequest request) {
+        final Goal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found with id: " + id));
 
         // Update only non-null fields
@@ -148,26 +148,26 @@ public class GoalService {
             validateDates(goal.getStartDate(), goal.getEndDate());
         }
 
-        Goal updatedGoal = goalRepository.save(goal);
+        final Goal updatedGoal = goalRepository.save(goal);
         return convertToDTO(updatedGoal);
     }
 
     /**
      * Update goal status
      */
-    public GoalDTO updateGoalStatus(Long id, GoalStatus status) {
-        Goal goal = goalRepository.findById(id)
+    public GoalDTO updateGoalStatus(final Long id, final GoalStatus status) {
+        final Goal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Goal not found with id: " + id));
-        
+
         goal.setStatus(status);
-        Goal updatedGoal = goalRepository.save(goal);
+        final Goal updatedGoal = goalRepository.save(goal);
         return convertToDTO(updatedGoal);
     }
 
     /**
      * Delete goal
      */
-    public void deleteGoal(Long id) {
+    public void deleteGoal(final Long id) {
         if (!goalRepository.existsById(id)) {
             throw new RuntimeException("Goal not found with id: " + id);
         }
@@ -178,7 +178,7 @@ public class GoalService {
      * Check if a goal exists
      */
     @Transactional(readOnly = true)
-    public boolean existsById(Long id) {
+    public boolean existsById(final Long id) {
         return goalRepository.existsById(id);
     }
 
@@ -186,7 +186,7 @@ public class GoalService {
      * Count goals by user
      */
     @Transactional(readOnly = true)
-    public long countGoalsByUserId(Long userId) {
+    public long countGoalsByUserId(final Long userId) {
         return goalRepository.countByUserId(userId);
     }
 
@@ -194,7 +194,7 @@ public class GoalService {
      * Count goals by user and status
      */
     @Transactional(readOnly = true)
-    public long countGoalsByUserIdAndStatus(Long userId, GoalStatus status) {
+    public long countGoalsByUserIdAndStatus(final Long userId, final GoalStatus status) {
         return goalRepository.countByUserIdAndStatus(userId, status);
     }
 
@@ -202,12 +202,12 @@ public class GoalService {
      * Get overdue goals (end date has passed and status is not completed)
      */
     @Transactional(readOnly = true)
-    public List<GoalDTO> getOverdueGoalsByUserId(Long userId) {
-        List<Goal> userGoals = goalRepository.findByUserId(userId);
-        LocalDate today = LocalDate.now();
-        
+    public List<GoalDTO> getOverdueGoalsByUserId(final Long userId) {
+        final List<Goal> userGoals = goalRepository.findByUserId(userId);
+        final LocalDate today = LocalDate.now();
+
         return userGoals.stream()
-                .filter(goal -> goal.getEndDate().isBefore(today) 
+                .filter(goal -> goal.getEndDate().isBefore(today)
                         && goal.getStatus() != GoalStatus.COMPLETED
                         && goal.getStatus() != GoalStatus.CANCELLED)
                 .map(this::convertToDTO)
@@ -218,12 +218,12 @@ public class GoalService {
      * Get active goals (in progress or not started, within date range)
      */
     @Transactional(readOnly = true)
-    public List<GoalDTO> getActiveGoalsByUserId(Long userId) {
-        List<Goal> userGoals = goalRepository.findByUserId(userId);
-        LocalDate today = LocalDate.now();
-        
+    public List<GoalDTO> getActiveGoalsByUserId(final Long userId) {
+        final List<Goal> userGoals = goalRepository.findByUserId(userId);
+        final LocalDate today = LocalDate.now();
+
         return userGoals.stream()
-                .filter(goal -> (goal.getStatus() == GoalStatus.IN_PROGRESS 
+                .filter(goal -> (goal.getStatus() == GoalStatus.IN_PROGRESS
                         || goal.getStatus() == GoalStatus.NOT_STARTED)
                         && !goal.getEndDate().isBefore(today))
                 .map(this::convertToDTO)
@@ -234,7 +234,7 @@ public class GoalService {
      * Get completed goals for a user
      */
     @Transactional(readOnly = true)
-    public List<GoalDTO> getCompletedGoalsByUserId(Long userId) {
+    public List<GoalDTO> getCompletedGoalsByUserId(final Long userId) {
         return goalRepository.findByUserIdAndStatus(userId, GoalStatus.COMPLETED).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -243,7 +243,7 @@ public class GoalService {
     /**
      * Validate that end date is after start date
      */
-    private void validateDates(LocalDate startDate, LocalDate endDate) {
+    private void validateDates(final LocalDate startDate, final LocalDate endDate) {
         if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
             throw new RuntimeException("End date must be after start date");
         }
@@ -252,7 +252,7 @@ public class GoalService {
     /**
      * Convert Goal entity to GoalDTO
      */
-    private GoalDTO convertToDTO(Goal goal) {
+    private GoalDTO convertToDTO(final Goal goal) {
         return new GoalDTO(
                 goal.getId(),
                 goal.getTitle(),

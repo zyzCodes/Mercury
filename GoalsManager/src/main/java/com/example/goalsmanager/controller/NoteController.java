@@ -21,7 +21,7 @@ public class NoteController {
     private final NoteService noteService;
 
     @Autowired
-    public NoteController(NoteService noteService) {
+    public NoteController(final NoteService noteService) {
         this.noteService = noteService;
     }
 
@@ -30,11 +30,11 @@ public class NoteController {
      * POST /api/notes
      */
     @PostMapping
-    public ResponseEntity<?> createNote(@Valid @RequestBody CreateNoteRequest request) {
+    public ResponseEntity<?> createNote(@Valid @RequestBody final CreateNoteRequest request) {
         try {
-            NoteDTO note = noteService.createNote(request);
+            final NoteDTO note = noteService.createNote(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(note);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -45,11 +45,11 @@ public class NoteController {
      * GET /api/notes/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getNoteById(@PathVariable Long id) {
+    public ResponseEntity<?> getNoteById(@PathVariable final Long id) {
         try {
-            NoteDTO note = noteService.getNoteById(id);
+            final NoteDTO note = noteService.getNoteById(id);
             return ResponseEntity.ok(note);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -60,11 +60,11 @@ public class NoteController {
      * GET /api/notes/goal/{goalId}
      */
     @GetMapping("/goal/{goalId}")
-    public ResponseEntity<?> getNotesByGoalId(@PathVariable Long goalId) {
+    public ResponseEntity<?> getNotesByGoalId(@PathVariable final Long goalId) {
         try {
-            List<NoteDTO> notes = noteService.getNotesByGoalId(goalId);
+            final List<NoteDTO> notes = noteService.getNotesByGoalId(goalId);
             return ResponseEntity.ok(notes);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -76,12 +76,12 @@ public class NoteController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(
-            @PathVariable Long id,
-            @RequestBody UpdateNoteRequest request) {
+            @PathVariable final Long id,
+            @RequestBody final UpdateNoteRequest request) {
         try {
-            NoteDTO note = noteService.updateNote(id, request);
+            final NoteDTO note = noteService.updateNote(id, request);
             return ResponseEntity.ok(note);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -92,11 +92,11 @@ public class NoteController {
      * DELETE /api/notes/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteNote(@PathVariable Long id) {
+    public ResponseEntity<?> deleteNote(@PathVariable final Long id) {
         try {
             noteService.deleteNote(id);
             return ResponseEntity.ok(createSuccessResponse("Note deleted successfully"));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -107,22 +107,22 @@ public class NoteController {
      * GET /api/notes/goal/{goalId}/count
      */
     @GetMapping("/goal/{goalId}/count")
-    public ResponseEntity<Map<String, Long>> countNotesByGoalId(@PathVariable Long goalId) {
-        long count = noteService.countNotesByGoalId(goalId);
-        Map<String, Long> response = new HashMap<>();
+    public ResponseEntity<Map<String, Long>> countNotesByGoalId(@PathVariable final Long goalId) {
+        final long count = noteService.countNotesByGoalId(goalId);
+        final Map<String, Long> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
     }
 
     // Helper methods for creating response objects
-    private Map<String, String> createErrorResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createErrorResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("error", message);
         return response;
     }
 
-    private Map<String, String> createSuccessResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createSuccessResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("message", message);
         return response;
     }

@@ -19,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(final UserService userService) {
         this.userService = userService;
     }
 
@@ -28,8 +28,8 @@ public class UserController {
      * POST /api/users
      */
     @PostMapping
-    public ResponseEntity<UserDTO> createOrUpdateUser(@Valid @RequestBody CreateUserRequest request) {
-        UserDTO user = userService.createOrUpdateUser(request);
+    public ResponseEntity<UserDTO> createOrUpdateUser(@Valid @RequestBody final CreateUserRequest request) {
+        final UserDTO user = userService.createOrUpdateUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
@@ -39,7 +39,7 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+        final List<UserDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
@@ -48,7 +48,7 @@ public class UserController {
      * GET /api/users/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable final Long id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -60,8 +60,8 @@ public class UserController {
      */
     @GetMapping("/provider/{provider}/{providerId}")
     public ResponseEntity<UserDTO> getUserByProviderAndProviderId(
-            @PathVariable String provider, 
-            @PathVariable String providerId) {
+            @PathVariable final String provider,
+            @PathVariable final String providerId) {
         return userService.getUserByProviderAndProviderId(provider, providerId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -72,8 +72,8 @@ public class UserController {
      * GET /api/users/provider/{provider}
      */
     @GetMapping("/provider/{provider}")
-    public ResponseEntity<List<UserDTO>> getUsersByProvider(@PathVariable String provider) {
-        List<UserDTO> users = userService.getUsersByProvider(provider);
+    public ResponseEntity<List<UserDTO>> getUsersByProvider(@PathVariable final String provider) {
+        final List<UserDTO> users = userService.getUsersByProvider(provider);
         return ResponseEntity.ok(users);
     }
 
@@ -82,7 +82,7 @@ public class UserController {
      * GET /api/users/username/{username}
      */
     @GetMapping("/username/{username}")
-    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable final String username) {
         return userService.getUserByUsername(username)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -93,7 +93,7 @@ public class UserController {
      * GET /api/users/email/{email}
      */
     @GetMapping("/email/{email}")
-    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
+    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable final String email) {
         return userService.getUserByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -104,8 +104,8 @@ public class UserController {
      * DELETE /api/users/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
-        boolean deleted = userService.deleteUser(id);
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable final Long id) {
+        final boolean deleted = userService.deleteUser(id);
         if (deleted) {
             return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
         } else {
@@ -120,9 +120,9 @@ public class UserController {
      */
     @GetMapping("/exists/provider/{provider}/{providerId}")
     public ResponseEntity<Map<String, Boolean>> checkUserExistsByProvider(
-            @PathVariable String provider,
-            @PathVariable String providerId) {
-        boolean exists = userService.existsByProviderAndProviderId(provider, providerId);
+            @PathVariable final String provider,
+            @PathVariable final String providerId) {
+        final boolean exists = userService.existsByProviderAndProviderId(provider, providerId);
         return ResponseEntity.ok(Map.of("exists", exists));
     }
 }

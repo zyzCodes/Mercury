@@ -23,7 +23,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @Autowired
-    public TaskController(TaskService taskService) {
+    public TaskController(final TaskService taskService) {
         this.taskService = taskService;
     }
 
@@ -32,11 +32,11 @@ public class TaskController {
      * POST /api/tasks
      */
     @PostMapping
-    public ResponseEntity<?> createTask(@Valid @RequestBody CreateTaskRequest request) {
+    public ResponseEntity<?> createTask(@Valid @RequestBody final CreateTaskRequest request) {
         try {
-            TaskDTO task = taskService.createTask(request);
+            final TaskDTO task = taskService.createTask(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(task);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -48,7 +48,7 @@ public class TaskController {
      */
     @GetMapping
     public ResponseEntity<List<TaskDTO>> getAllTasks() {
-        List<TaskDTO> tasks = taskService.getAllTasks();
+        final List<TaskDTO> tasks = taskService.getAllTasks();
         return ResponseEntity.ok(tasks);
     }
 
@@ -57,11 +57,11 @@ public class TaskController {
      * GET /api/tasks/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTaskById(@PathVariable Long id) {
+    public ResponseEntity<?> getTaskById(@PathVariable final Long id) {
         try {
-            TaskDTO task = taskService.getTaskById(id);
+            final TaskDTO task = taskService.getTaskById(id);
             return ResponseEntity.ok(task);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -72,11 +72,11 @@ public class TaskController {
      * GET /api/tasks/user/{userId}
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getTasksByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getTasksByUserId(@PathVariable final Long userId) {
         try {
-            List<TaskDTO> tasks = taskService.getTasksByUserId(userId);
+            final List<TaskDTO> tasks = taskService.getTasksByUserId(userId);
             return ResponseEntity.ok(tasks);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -87,11 +87,11 @@ public class TaskController {
      * GET /api/tasks/habit/{habitId}
      */
     @GetMapping("/habit/{habitId}")
-    public ResponseEntity<?> getTasksByHabitId(@PathVariable Long habitId) {
+    public ResponseEntity<?> getTasksByHabitId(@PathVariable final Long habitId) {
         try {
-            List<TaskDTO> tasks = taskService.getTasksByHabitId(habitId);
+            final List<TaskDTO> tasks = taskService.getTasksByHabitId(habitId);
             return ResponseEntity.ok(tasks);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -103,13 +103,13 @@ public class TaskController {
      */
     @GetMapping("/user/{userId}/week")
     public ResponseEntity<?> getTasksByUserIdAndDateRange(
-            @PathVariable Long userId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @PathVariable final Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate endDate) {
         try {
-            List<TaskDTO> tasks = taskService.getTasksByUserIdAndDateRange(userId, startDate, endDate);
+            final List<TaskDTO> tasks = taskService.getTasksByUserIdAndDateRange(userId, startDate, endDate);
             return ResponseEntity.ok(tasks);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -120,11 +120,11 @@ public class TaskController {
      * GET /api/tasks/user/{userId}/completed
      */
     @GetMapping("/user/{userId}/completed")
-    public ResponseEntity<?> getCompletedTasksByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getCompletedTasksByUserId(@PathVariable final Long userId) {
         try {
-            List<TaskDTO> tasks = taskService.getCompletedTasksByUserId(userId);
+            final List<TaskDTO> tasks = taskService.getCompletedTasksByUserId(userId);
             return ResponseEntity.ok(tasks);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -135,11 +135,11 @@ public class TaskController {
      * GET /api/tasks/user/{userId}/pending
      */
     @GetMapping("/user/{userId}/pending")
-    public ResponseEntity<?> getPendingTasksByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getPendingTasksByUserId(@PathVariable final Long userId) {
         try {
-            List<TaskDTO> tasks = taskService.getPendingTasksByUserId(userId);
+            final List<TaskDTO> tasks = taskService.getPendingTasksByUserId(userId);
             return ResponseEntity.ok(tasks);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -151,12 +151,12 @@ public class TaskController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTask(
-            @PathVariable Long id,
-            @RequestBody UpdateTaskRequest request) {
+            @PathVariable final Long id,
+            @RequestBody final UpdateTaskRequest request) {
         try {
-            TaskDTO task = taskService.updateTask(id, request);
+            final TaskDTO task = taskService.updateTask(id, request);
             return ResponseEntity.ok(task);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -167,11 +167,11 @@ public class TaskController {
      * PATCH /api/tasks/{id}/toggle
      */
     @PatchMapping("/{id}/toggle")
-    public ResponseEntity<?> toggleTaskCompletion(@PathVariable Long id) {
+    public ResponseEntity<?> toggleTaskCompletion(@PathVariable final Long id) {
         try {
-            TaskDTO task = taskService.toggleTaskCompletion(id);
+            final TaskDTO task = taskService.toggleTaskCompletion(id);
             return ResponseEntity.ok(task);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -182,11 +182,11 @@ public class TaskController {
      * DELETE /api/tasks/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTask(@PathVariable final Long id) {
         try {
             taskService.deleteTask(id);
             return ResponseEntity.ok(createSuccessResponse("Task deleted successfully"));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(createErrorResponse(e.getMessage()));
         }
@@ -197,9 +197,9 @@ public class TaskController {
      * GET /api/tasks/exists/{id}
      */
     @GetMapping("/exists/{id}")
-    public ResponseEntity<Map<String, Boolean>> checkTaskExists(@PathVariable Long id) {
-        boolean exists = taskService.existsById(id);
-        Map<String, Boolean> response = new HashMap<>();
+    public ResponseEntity<Map<String, Boolean>> checkTaskExists(@PathVariable final Long id) {
+        final boolean exists = taskService.existsById(id);
+        final Map<String, Boolean> response = new HashMap<>();
         response.put("exists", exists);
         return ResponseEntity.ok(response);
     }
@@ -209,9 +209,9 @@ public class TaskController {
      * GET /api/tasks/user/{userId}/count
      */
     @GetMapping("/user/{userId}/count")
-    public ResponseEntity<Map<String, Long>> countTasksByUserId(@PathVariable Long userId) {
-        long count = taskService.countTasksByUserId(userId);
-        Map<String, Long> response = new HashMap<>();
+    public ResponseEntity<Map<String, Long>> countTasksByUserId(@PathVariable final Long userId) {
+        final long count = taskService.countTasksByUserId(userId);
+        final Map<String, Long> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
     }
@@ -221,22 +221,22 @@ public class TaskController {
      * GET /api/tasks/habit/{habitId}/count
      */
     @GetMapping("/habit/{habitId}/count")
-    public ResponseEntity<Map<String, Long>> countTasksByHabitId(@PathVariable Long habitId) {
-        long count = taskService.countTasksByHabitId(habitId);
-        Map<String, Long> response = new HashMap<>();
+    public ResponseEntity<Map<String, Long>> countTasksByHabitId(@PathVariable final Long habitId) {
+        final long count = taskService.countTasksByHabitId(habitId);
+        final Map<String, Long> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
     }
 
     // Helper methods for creating response objects
-    private Map<String, String> createErrorResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createErrorResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("error", message);
         return response;
     }
 
-    private Map<String, String> createSuccessResponse(String message) {
-        Map<String, String> response = new HashMap<>();
+    private Map<String, String> createSuccessResponse(final String message) {
+        final Map<String, String> response = new HashMap<>();
         response.put("message", message);
         return response;
     }
